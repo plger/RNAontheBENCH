@@ -1,0 +1,16 @@
+Package: RNAontheBENCH
+Type: Package
+Title: RNAontheBENCH: A benchmarking ressource for RNAseq quantification and differential
+    expression analysis methods
+Version: 1.1
+Date: 2015-12-07
+Author: Pierre-Luc Germain
+Maintainer: <pierre.germain@ieo.eu>
+Depends: MASS, edgeR, limma
+Suggests: DESeq, DESeq2, sleuth, rminer, rmarkdown, knitr
+URL: http://bio.ieo.eu/rnaseqBenchmark
+Description: RNA on the Benchmark of Expression by nCounter Hybridization (RNAontheBENCH) is a resource for benchmarking RNAseq quantification and differential expression analysis methods on the basis of empirical data.
+License: GPL
+RoxygenNote: 5.0.1
+VignetteBuilder: rmarkdown,
+    knitr
