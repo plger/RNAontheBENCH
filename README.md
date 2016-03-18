@@ -20,6 +20,12 @@ To install the package, download it and install it using the following R command
 install.packages("path/to/RNAontheBENCH.tar.gz", repos=NULL)
 ```
 
+Alternatively, if you have `devtools` installed you can install the package directly from the git repository using:
+```
+library(devtools)
+install_git("https://github.com/plger/RNAontheBENCH")
+```
+
 One the package is installed, you can access the vignette for some examples, using:
 ```
 library(RNAontheBENCH)
