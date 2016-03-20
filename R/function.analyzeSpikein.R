@@ -6,11 +6,12 @@
 #' @param ANALYSIS_NAME A string indicating the name of the analysis/pipeline. Will be used in filenames, plot titles, etc.
 #' @param rnaseq The path to the gene-level RNAseq expression matrix. If not given, will look for relevant files in the working directory. The expression matrix should have gene symbols in the first column/row.names, and sample names (e.g. 'AJ80', etc) as column headers.
 #' @param qt A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").
+#' @param fc.undetected The foldchange to assign to undetected spike-ins (should be either 1 or NA, default 1)
 #'
 #' @return Nothing, but produces many files in the working directory...
 #'
 #' @export
-analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt){
+analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
   sl <- list(analysis=ANALYSIS_NAME)
   qt <- match.arg(toupper(qt),c("FPKM","TPM","COUNTS"))
   
@@ -137,7 +138,8 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt){
   d <- data.frame(expected=ercc$expected.fold.change.ratio)
   d$avg.mix1=apply(spn[,df$mix==1],1,na.rm=T,FUN=mean)
   d$avg.mix2=apply(spn[,df$mix==2],1,na.rm=T,FUN=mean)
-  d$observed <- d$avg.mix1/d$avg.mix2
+  d$observed <- foldchange(d$avg.mix2,d$avg.mix1,fc.undetected)
+  
   w <- isCleanData(d$observed,d$expected)
   sl[["cor.foldchange"]] <- cor(d$observed[w], d$expected[w])
   w <- isCleanData(log2(d$observed),log2(d$expected))

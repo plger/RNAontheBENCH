@@ -13,7 +13,7 @@ compareWithNanostring(ANALYSIS_NAME, rnaseq = NULL, qt, normMethod = NULL)
 
 \item{qt}{A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").}
 
-\item{normMethod}{The normalization method to use (see \code{\link{donorm}}). Defaults to 'housekeeping'.}
+\item{normMethod}{The normalization method to use (see \code{\link{donorm}}). Defaults to 'housekeeping' for gene-level, and 'TMM' for transcript-level.}
 }
 \value{
 Nothing, but produces many files in the working directory...

@@ -67,6 +67,28 @@ MdAE <- function(x,y){
   return(median(abs(y-x)))
 }
 
+#' foldchange
+#'
+#' Returns the foldchange, or the non-0 value +1 (or its inverse) if one of the values is 0, or 1/NA (as specified) if both are zero.
+#'
+#' @param x a numeric vector
+#' @param y a numeric vector of same length as x.
+#' @param na.fc the value to return is both x and y are 0
+#'
+#' @return A vector of same length as x containing the foldchange of y/x
+#'
+#' @examples
+#' foldchange( c(5,Inf,0,6,0), c(0,1,2,3,0) )
+#'
+#' @export
+foldchange <- function(x,y, na.fc=NA){
+    fc <- y/x
+    fc[which(x==0)] <- y[which(x==0)]+1
+    fc[which(y==0)] <- 1/(x[which(y==0)]+1)
+    fc[which(is.na(fc) | is.nan(fc))] <- na.fc
+    return(fc)
+}
+
 #' Make transparent
 #'
 #' Adds transparency to a color.

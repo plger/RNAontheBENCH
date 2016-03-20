@@ -4,12 +4,14 @@
 \alias{ROC}
 \title{ROC}
 \usage{
-ROC(p, sig, main = NULL)
+ROC(p, sig, rounding = 5, main = NULL)
 }
 \arguments{
 \item{p}{The p-value.}
 
 \item{sig}{A logical vector indicating whether each element in 'p' is actually differentially-expressed (TRUE) or not.}
+
+\item{rounding}{The rounding (number of digits) of log-transformed p-values at which to plot (default 3). Increasing this number will increase the resolution of the curve, but also increase execution time.}
 
 \item{main}{Plot title.}
 }

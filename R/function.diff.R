@@ -153,7 +153,6 @@ deNanostring.compare <- function(results, method, norm, quantification="", thres
     na$p <- apply(na,1,FUN=function(x){ x <- as.numeric(x); t <- try(t.test(log(x[which(cn==3)]),log(x[which(cn==1)])),silent=T); if(class(t)=="try-error") return(NA); t$p.value})
     na$p[which(is.na(na$p))] <- 1
     na$fc <- apply(na,1,FUN=function(x){ x <- as.numeric(x); mean(x[which(cn==3)])/mean(x[which(cn==1)])})
-    na
     results <- results[row.names(na),]
     results$p[which(is.na(results$p))] <- 1
     results$log2FC[which(is.na(results$log2FC))] <- 0
@@ -537,10 +536,12 @@ compareSpikeinDEcalls <- function(tests, thres=0.01, colors=NULL){
 #' @param show.AUC Logical; whether to show the area under the curve in the figure's legend. Default TRUE.
 #' @param thres Numeric value between 0 and 1, indicating the p-value treshold to be plotted on each curve. Set to NULL to plot no threshold.
 #' @param lwd Line width, passed to the plotting functions. Default 2.
+#' @param rounding The rounding (number of digits) of log-transformed p-values at which to plot (default 3). Increasing this number will increase the resolution of the curve, but also increase execution time.
+#' @param colors A vector of colors for the different tests. If NULL (default), R basic colors are used.
 #' @param ... Any further argument passed to the initial plot function.
 #'
 #' @export
-mROC <- function(tests, sig, show.AUC=T, thres=0.01, lwd=2, colors=NULL, ...){
+mROC <- function(tests, sig, show.AUC=T, thres=0.01, lwd=2, rounding=3, na.rm=T, colors=NULL, ...){
   shapes <- c(1,22,23,2,6,7,10)
   if(is.null(colors)) colors <- 1:length(tests)
   ll <- list()
@@ -553,12 +554,12 @@ mROC <- function(tests, sig, show.AUC=T, thres=0.01, lwd=2, colors=NULL, ...){
     o <- order(p, decreasing=T)
     p <- p[o]
     sig2 <- sig[o]
-    print(p)
-    d <- data.frame(y=sapply(2:length(p),FUN=function(x){ sum(sig2 & p <= p[x])/sum(sig2) }),
-		  x=sapply(2:length(p),FUN=function(x){ sum(!(p <= p[x] | sig2))/sum(!sig2) }))
+    pp <- unique(2^round(log2(p+1),rounding)-1)
+    d <- data.frame(y=sapply(pp,FUN=function(x){ sum(sig2 & p <= x, na.rm=na.rm)/sum(sig2, na.rm=na.rm) }),
+		  x=sapply(pp,FUN=function(x){ sum(!(p <= x | sig2), na.rm=na.rm)/sum(!sig2, na.rm=na.rm) }))
     d$x <- 1-d$x
     if(!is.null(thres)){
-        ff[de,] <- c(1-sum(!(p <= thres | sig2))/sum(!sig2), sum(sig2 & p <= thres)/sum(sig2))
+        ff[de,] <- c(1-sum(!(p <= thres | sig2), na.rm=na.rm)/sum(!sig2, na.rm=na.rm), sum(sig2 & p <= thres, na.rm=na.rm)/sum(sig2, na.rm=na.rm))
     }
     ll[[de]] <- d[which(!duplicated(d)),]
   }
@@ -585,18 +586,20 @@ mROC <- function(tests, sig, show.AUC=T, thres=0.01, lwd=2, colors=NULL, ...){
 #'
 #' @param p The p-value.
 #' @param sig A logical vector indicating whether each element in 'p' is actually differentially-expressed (TRUE) or not.
+#' @param rounding The rounding (number of digits) of log-transformed p-values at which to plot (default 3). Increasing this number will increase the resolution of the curve, but also increase execution time.
 #' @param main Plot title.
 #'
 #' @return Nothing.
 #'
 #' @export
-ROC <- function(p,sig,main=NULL){
+ROC <- function(p,sig,main=NULL,rounding=5){
   if(is.null(main))	main <- "A: ROC curve"
   o <- order(p, decreasing=T)
   p <- as.numeric(p[o])
   sig <- sig[o]
-  d <- data.frame(sensitivity=sapply(2:length(p),FUN=function(x){ sum(sig & p <= p[x])/sum(sig) }),
-		  specificity=sapply(2:length(p),FUN=function(x){ sum(!(p <= p[x] | sig))/sum(!sig) }))
+  pp <- unique(2^round(log2(p+1),rounding)-1)
+  d <- data.frame(sensitivity=sapply(pp,FUN=function(x){ sum(sig & p <= x)/sum(sig) }),
+		  specificity=sapply(pp,FUN=function(x){ sum(!(p <= x | sig))/sum(!sig) }))
   d <- d[which(!duplicated(d)),]
   plot(1-d$specificity, d$sensitivity,xlab="1-Specificity",ylab="Sensitivity",xlim=c(0,1),ylim=c(0,1),type="b",lwd=2,main=main)
   legend("bottomright",bty="n",legend=c(paste("AUC:",round(auc(1-d$specificity, d$sensitivity),3))))

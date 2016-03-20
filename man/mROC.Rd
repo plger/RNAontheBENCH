@@ -4,8 +4,8 @@
 \alias{mROC}
 \title{mROC}
 \usage{
-mROC(tests, sig, show.AUC = T, thres = 0.01, lwd = 2, colors = NULL,
-  ...)
+mROC(tests, sig, show.AUC = T, thres = 0.01, lwd = 2, rounding = 3,
+  na.rm = T, colors = NULL, ...)
 }
 \arguments{
 \item{tests}{A list of tests, each element of which should be a data.frame with a "p" column indicating the p-value under that test.}
@@ -17,6 +17,10 @@ mROC(tests, sig, show.AUC = T, thres = 0.01, lwd = 2, colors = NULL,
 \item{thres}{Numeric value between 0 and 1, indicating the p-value treshold to be plotted on each curve. Set to NULL to plot no threshold.}
 
 \item{lwd}{Line width, passed to the plotting functions. Default 2.}
+
+\item{rounding}{The rounding (number of digits) of log-transformed p-values at which to plot (default 3). Increasing this number will increase the resolution of the curve, but also increase execution time.}
+
+\item{colors}{A vector of colors for the different tests. If NULL (default), R basic colors are used.}
 
 \item{...}{Any further argument passed to the initial plot function.}
 }

@@ -4,7 +4,7 @@
 \alias{analyzeSpikein}
 \title{Comparison quantification with the expected spike-in concentrations.}
 \usage{
-analyzeSpikein(ANALYSIS_NAME, rnaseq = NULL, qt)
+analyzeSpikein(ANALYSIS_NAME, rnaseq = NULL, qt, fc.undetected = 1)
 }
 \arguments{
 \item{ANALYSIS_NAME}{A string indicating the name of the analysis/pipeline. Will be used in filenames, plot titles, etc.}
@@ -12,6 +12,8 @@ analyzeSpikein(ANALYSIS_NAME, rnaseq = NULL, qt)
 \item{rnaseq}{The path to the gene-level RNAseq expression matrix. If not given, will look for relevant files in the working directory. The expression matrix should have gene symbols in the first column/row.names, and sample names (e.g. 'AJ80', etc) as column headers.}
 
 \item{qt}{A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").}
+
+\item{fc.undetected}{The foldchange to assign to undetected spike-ins (should be either 1 or NA, default 1)}
 }
 \value{
 Nothing, but produces many files in the working directory...

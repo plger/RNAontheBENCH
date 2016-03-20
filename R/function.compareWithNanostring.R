@@ -6,7 +6,7 @@
 #' @param ANALYSIS_NAME A string indicating the name of the analysis/pipeline. Will be used in filenames, plot titles, etc.
 #' @param rnaseq The path to the gene-level RNAseq expression matrix. If not given, will look for relevant files in the working directory. The expression matrix should have refseq id or gene symbols in the first column/row.names, and sample names (e.g. 'AJ80') as column headers.
 #' @param qt A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").
-#' @param normMethod The normalization method to use (see \code{\link{donorm}}). Defaults to 'housekeeping'.
+#' @param normMethod The normalization method to use (see \code{\link{donorm}}). Defaults to 'housekeeping' for gene-level, and 'TMM' for transcript-level.
 #'
 #' @return Nothing, but produces many files in the working directory...
 #'
