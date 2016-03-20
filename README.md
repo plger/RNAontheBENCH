@@ -28,4 +28,4 @@ library(RNAontheBENCH)
 vignette("RNAontheBENCH")
 ```
 
-Alternatively, you can view the vignette [here](inst/doc/RNAontheBENCH.html).
+Alternatively, you can view the vignette [here](vignette/RNAontheBENCH_files/RNAontheBENCH.html).
