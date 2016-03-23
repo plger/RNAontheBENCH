@@ -2,7 +2,7 @@
 #'
 #' Runs a comparison of differential expression calls on the SEQC data, comparing calls across conditions to calls within conditions. 
 #' The assumption here (and made by the SEQC consortium) is that differential expression across replicates are false positives.
-#' See 'seqc.diff.example' for an example usage.
+#' See \code{\link{seqc.diff.example}} for an example usage.
 #'
 #' @param e The count matrix or data.frame. Anything can be used as row names (e.g. gene symbols, transcript ids...). If NULL, the 'site' parameter is used to fetch the quantification from the seqc package (if installed).
 #' @param norm The normalization method to use (see \code{\link{donorm}}). Defaults to 'TMM'.
@@ -58,7 +58,7 @@ seqc.diff <- function(e=NULL, norm="TMM", de="edgeR", site="BGI", between.groups
 #' @param folders Folders containing the quantification and bootstraps. The folders should be named "A_1" and so on.
 #' @param between.groups A vector of integers from 1 to 5 indicating the replicates to be used for comparison across conditions. Default 1:5.
 #' @param inner.groups A list of two vectors, each containing the replicates to be used for comparison inside each condition. Default list(c(1,2,3),c(4,5)).
-#' @param do.plot Logical, whether to produce Positives plots (see posplot). Default TRUE.
+#' @param do.plot Logical, whether to produce Positives plots (see \code{\link{posplot}}). Default TRUE.
 #'
 #' @return A list of differential expression calls.
 #'
@@ -156,14 +156,14 @@ posplot <- function(p,fp1,fp2=NULL,subsamp=200,pround=2,add=F,xlab="DEGs between
 
 #' seqc.diff.example
 #'
-#' Compares differential expression analysis (DEA) methods using the 'diff.seqc' function, and produces ROC-like plots.
+#' Compares differential expression analysis (DEA) methods using the \code{\link{diff.seqc}} function, and produces ROC-like plots.
 #'
 #' @param e The count matrix or data.frame. Anything can be used as row names (e.g. gene symbols, transcript ids...). If NULL, the 'site' parameter is used to fetch the quantification from the seqc package (if installed).
 #' @param site If 'e' is NULL, data from the specified sequencing site will be fetched from the seqc package. Default BGI.
 #' @param tests A vector of the DEA methods to be compared.
 #' @param between.groups A vector of integers from 1 to 5 indicating the replicates to be used for comparison across conditions. Default 1:5.
 #' @param inner.groups A list of two vectors, each containing the replicates to be used for comparison inside each condition. Default list(c(1,2,3),c(4,5)).
-#' @param do.plot Logical, whether to produce Positives plots (see posplot). Default TRUE.
+#' @param do.plot Logical, whether to produce Positives plots (see \code{\link{posplot}}). Default TRUE.
 #' @param returnData Logical, whether to return the resulting data.
 #'
 #' @return Produces a plot, and returns a list if returnData=T.
@@ -191,7 +191,7 @@ seqc.diff.example <- function(e=NULL, site="BGI", tests=c("edgeR","voom","DESeq2
 
 #' seqc.prepareData
 #'
-#' Fetches and prepare SEQC data using the seqc package.
+#' Fetches and prepare SEQC data using the \code{\link{seqc}} package.
 #'
 #' @param site Sequencing site, default BGI.
 #' @param removeERCC Logical; whether to remove the spike-ins (default TRUE)
@@ -217,7 +217,7 @@ seqc.prepareData <- function(site="BGI", removeERCC=T){
 
 #' seqc.diff.plot
 #'
-#' Produces a combination of 'positives plot' (see 'posplot') for a list of differential expression calls on the SEQC data.
+#' Produces a combination of 'positives plot' (see \code{\link{posplot}}) for a list of differential expression calls on the SEQC data.
 #' The x/ylim parameters control the 'zoomed plots'; the default settings are good for gene-level using all replicates.
 #' For gene-level with only 3 samples/group, use:
 #'  xlim=c(0,60), ylimAB=c(5000,15500), ylimCD=c(2000,12000)

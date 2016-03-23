@@ -4,11 +4,20 @@
 #' Will produce a number of benchmarking plots and files in the current working directory.
 #'
 #' @param ANALYSIS_NAME A string indicating the name of the analysis/pipeline. Will be used in filenames, plot titles, etc.
-#' @param rnaseq The path to the gene-level RNAseq expression matrix. If not given, will look for relevant files in the working directory. The expression matrix should have gene symbols in the first column/row.names, and sample names (e.g. 'AJ80', etc) as column headers.
+#' @param rnaseq The path to the gene-level RNAseq expression matrix. If not given, will look for relevant files in the working directory. The expression matrix should have gene symbols in the first column/row.names, and sample names (e.g. 'AJ80' for the 12-samples dataset, "A_1" for SEQC, etc) as column headers.
 #' @param qt A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").
 #' @param fc.undetected The foldchange to assign to undetected spike-ins (should be either 1 or NA, default 1)
 #'
 #' @return Nothing, but produces many files in the working directory...
+#'
+#' @examples
+#' # first we create a directory and put the example quantification file in it:
+#' data(exampledata)
+#' dir.create("example")
+#' write.table(exampleGeneLevel,"w12.genes.quant",sep="\t",quote=F)
+#' # then we run the function, giving a name to the analysis, 
+#' # specifying the file and type of quantification:
+#' analyzeSpikein("tophat.featureCount", "w12.genes.quant", qt="COUNTS")
 #'
 #' @export
 analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
@@ -21,12 +30,11 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
     sp <- read.delim(rnaseq,header=T,row.names=1)
     if("DQ854994" %in% row.names(sp))   sp <- .getSpikeinsFromTranscripts(sp)
   }
-  
   dinf <- .checkDataset(sp, ANALYSIS_NAME)
   if(dinf[["dataset"]] == "sim")    stop("There are no spike-ins to analyze in the simulated data.")
   dinf$ptitle <- paste(dinf$dataset,":",dinf$analysis," (spike-ins)",sep="")
   dinf$fname <- .plfilename(dinf$dataset,dinf$analysis,"spikein")
-
+  
   data("ercc")
   if(dinf$level=="gene"){
     row.names(ercc) <- ercc$ERCC.ID
@@ -60,13 +68,13 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
   df <- data.frame(row.names=names(sp))
   df$mix1.cor <- apply(sp,2,FUN=function(x){ cor(as.numeric(x),as.numeric(ercc$concentration.in.Mix.1..attomoles.ul.))})
   df$mix2.cor <- apply(sp,2,FUN=function(x){ cor(as.numeric(x),as.numeric(ercc$concentration.in.Mix.2..attomoles.ul.))})
-  df$mix <- apply(df,1,FUN=function(x){ order(as.numeric(x),decreasing=T)[1]})
+  df$best.matching.mix <- apply(df,1,FUN=function(x){ order(as.numeric(x),decreasing=T)[1]})
 
   # renormalize samples according to their expected spike-in amounts, 
   # thereby avoiding discrepancies due to the different amounts of spike-ins put in the cells.
   # We first make a copy of the spike-in mesurements, which we'll multiply by FC between mixes to make an artificial situation were the samples have the same mix:
   sp2 <- sp
-  for(i in which(df$mix==2))	sp2[,i] <- as.numeric(sp2[,i])*as.numeric(ercc$expected.fold.change.ratio)
+  for(i in which(df$best.matching.mix==2))	sp2[,i] <- as.numeric(sp2[,i])*as.numeric(ercc$expected.fold.change.ratio)
   # we then use this to get linear normalizers
   nf <- getLinearNormalizers(sp2)
   # which we can then apply to the original measurements
@@ -83,16 +91,14 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
         mix1 <- paste("A",1:5,sep="_")
     }
   }
-  if(any(df$mix[which(row.names(df) %in% mix1)] != 1) | any(df$mix[which(!(row.names(df) %in% mix1))] != 2)){
-    warning(paste(ANALYSIS_NAME,"There appears to be a problem with the spike-in quantification or normalization, because samples were not assigned the correct spike-in mixes.",sep=" - "))
-    df$expected.mix <- 2
-    df$expected.mix[mix1] <- 1
+  df$expected.mix <- ifelse(row.names(df) %in% mix1, 1, 2)
+  if(any(df$best.matching.mix != df$expected.mix)){
+    warning(paste(ANALYSIS_NAME,"There appears to be a problem with the spike-in quantification or normalization, because samples do not correlate with the correct spike-in mixes. This can happen with very poor quantifications, can be due to a mis-labeling of the columns, or wrong specification of the samples having mix1. Analysis will proceed, but you should double-check the samples' mix assignment:",sep=" - "),immediate.=T)
     print(df)
   }
   
   # next, we must create the x values (expected spike-in concentrations), according to the mix injected in each sample
-  xdf <- ercc[,df$mix+4]
-
+  xdf <- ercc[,df$expected.mix+4]
   op <- options(warn=-1)
   on.exit(options(op))
 
@@ -136,8 +142,8 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
 
   # we average the samples according to their mix, and calculate the observed foldchange between mixes
   d <- data.frame(expected=ercc$expected.fold.change.ratio)
-  d$avg.mix1=apply(spn[,df$mix==1],1,na.rm=T,FUN=mean)
-  d$avg.mix2=apply(spn[,df$mix==2],1,na.rm=T,FUN=mean)
+  d$avg.mix1=apply(spn[,df$expected.mix==1],1,na.rm=T,FUN=mean)
+  d$avg.mix2=apply(spn[,df$expected.mix==2],1,na.rm=T,FUN=mean)
   d$observed <- foldchange(d$avg.mix2,d$avg.mix1,fc.undetected)
   
   w <- isCleanData(d$observed,d$expected)
@@ -148,7 +154,7 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
   simStats(d$observed,d$expected,dinf$ptitle,paste(dinf$fname,"foldchanges",sep="."),norm=F)
   
   # we calculate statistical significance of the difference between mixes
-  pvals <- apply(spn, 1, FUN=function(x){ t.test(as.numeric(x[df$mix==1]),as.numeric(x[df$mix==2]))$p.value})
+  pvals <- apply(spn, 1, FUN=function(x){ t.test(as.numeric(x[df$expected.mix==1]),as.numeric(x[df$expected.mix==2]))$p.value})
   sl[["significant"]] <- sum(pvals < 0.05 & ercc$expected.fold.change.ratio != 1, na.rm=T)
   sl[["false.positives"]] <- sum(pvals < 0.05 & ercc$expected.fold.change.ratio == 1, na.rm=T)
   

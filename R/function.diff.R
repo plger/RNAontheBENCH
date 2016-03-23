@@ -8,47 +8,54 @@
 #' Runs a spike-in differential expression analysis.
 #'
 #' Runs a differential expression analysis and compares it to real differences between spike-in mixes. 
-#' Sleuth is handled in a different function (see \code{\link{sleuthWrapper}})
+#' Sleuth is handled in a different function (see \code{\link{sleuthWrapper}})  
+#' A warning is given if the specified/expected mix distribution does not match the observed one.
 #'
-#' @param dat The expression matrix or data.frame, with gene symbols or transcript Refseq IDs as row.names, and sample names as column headers.
+#' @param dat The counts matrix or data.frame, with gene symbols or transcript Refseq IDs as row.names, and sample names as column headers.
 #' @param method The differential expression method to use. Either 'edgeR', 'DESeq', 'DESeq2', 'EBSeq', 'voom', 't' (t-test), or 'logt' (t-test on log-transformed values). A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").
 #' @param norm The normalization method to use (see \code{\link{donorm}}). Defaults to 'TMM'.
 #' @param quantification A string indicating the name of the analysis/pipeline form which the quantification comes. Will be used in filenames, plot titles, etc.
 #' @param homogenize.mixes logical, whether the two spike-in mixes should be homogenized for the purpose of calculating normalization factors.
 #' @param saveResults Logical, whether to save the results of the DEA in the current working directory (default FALSE).
 #' @param savePlot Logical, whether to save the plot in the current working directory (default FALSE).
+#' @param mix1 A character vector indicating the column names of `dat` that have been spiked with mix 1. If you are using the SEQC data or the dataset at the basis of this package, leave this to NULL.
 #'
 #' @return A data.frame with the results of the differential expression analysis, as well as a plot.
 #'
 #' @examples
 #' data(exampledata)
-#' res <- deSpikein(exampleGeneLevel, method="edgeR", norm="TMM", quantification="Tophat-featureCounts")
+#' res <- deSpikein(exampleGeneLevel, method="edgeR", norm="TMM", 
+#'   quantification="Tophat-featureCounts")
 #'
 #' @export
-deSpikein <- function(dat, method="edgeR", norm="TMM", quantification="", homogenize.mixes=T, saveResults=F, savePlot=F){
+deSpikein <- function(dat, method="edgeR", norm="TMM", quantification="", homogenize.mixes=T, saveResults=F, savePlot=F, mix1=NULL){
   method=match.arg(method, c("t","logt","edgeR","voom","DESeq","DESeq2","EBSeq"))
   if(method %in% c("DESeq","DESeq2","EBSeq")){
     if(!.checkPkg(method))	stop(paste("The package ",method," should first be installed to call this with method='",method,"'",sep=""))
   }
   
-  dinf <- .checkDataset(dat)
-
-  if(dinf$dataset == "sim")	stop("This appears to be simulated data, in which spike-ins cannot be analyzed...")
-  
-  # indicates which samples have the spike-in mix 1 (others have spike-in mix 2)
-  if(dinf$dataset == "w12"){
-    mix1 <- c("AJ86","AJ90","AJ91")
+  if(!is.null(mix1)){
+    if(!all(mix1 %in% colnames(dat)))   stop("The samples with mix1 were provided manually, but cannot be found in the counts matrix!")
+    message("Using specified mix1 columns.")
   }else{
-    if(dinf$dataset == "w6"){
-        mix1 <- c("CFG.sh2","c3391S.sh2","w306o.shCTR","w306o.sh2")
+    dinf <- .checkDataset(dat)
+    if(dinf$dataset == "sim")	stop("This appears to be simulated data, in which spike-ins cannot be analyzed...")
+    # indicates which samples have the spike-in mix 1 (others have spike-in mix 2)
+    if(dinf$dataset == "w12"){
+        mix1 <- c("AJ86","AJ90","AJ91")
     }else{
-        mix1 <- paste("A",1:5,sep="_")
-        dat <- dat[,paste(rep(c("A","B"),each=5),1:5,sep="_")]
+        if(dinf$dataset == "w6"){
+            mix1 <- c("CFG.sh2","c3391S.sh2","w306o.shCTR","w306o.sh2")
+        }else{
+            mix1 <- paste("A",1:5,sep="")
+            dat <- dat[,paste(rep(c("A","B"),each=5),1:5,sep="_")]
+        }
     }
   }
   
   data("ercc")
-  if("DQ459412" %in% row.names(dat)){
+  if(!(sum(as.character(ercc$TX.ID) %in% row.names(dat))+sum(as.character(ercc$ERCC.ID) %in% row.names(dat))>1))    stop("The data given appears not to contain spike-ins, or not having proper row.names.")
+  if( sum(as.character(ercc$TX.ID) %in% row.names(dat)) > sum(as.character(ercc$ERCC.ID) %in% row.names(dat)) ){
     # transcript names
     row.names(ercc) <- ercc$TX.ID
   }else{
@@ -97,7 +104,8 @@ deSpikein <- function(dat, method="edgeR", norm="TMM", quantification="", homoge
 #'
 #' @examples
 #' data(exampledata)
-#' deNanostring(exampleGeneLevel, method="edgeR", norm="TMM", quantification="Tophat-featureCounts")
+#' deNanostring(exampleGeneLevel, method="edgeR", norm="TMM", 
+#'   quantification="Tophat-featureCounts")
 #'
 #' @export
 deNanostring <- function(rnaseq=NULL, method="edgeR", norm="TMM", quantification="", threshold=0.01){
@@ -279,7 +287,8 @@ sleuthWrapper <- function(name, folders=NULL, norm="TMM", savePlot=F){
 
 #' Runs a differential expression analysis.
 #'
-#' Runs a differential expression analysis using the selected method. This is used by the \code{\link{differentialExpression}} function.
+#' Runs a differential expression analysis using the selected method. This is used by the \code{\link{differentialExpression}} function. 
+#' This is simply a wrapper to make sure that the different analysis methods use the same normalization method and return results in the same format.
 #'
 #' @param data The expression matrix or data.frame, with gene symbols or transcript Refseq IDs as row.names.
 #' @param groups A logical vector (or coercible to logical) of length ncol(data), indicating to which group each sample (i.e. column in 'data') belongs. There can be only two groups.
@@ -404,7 +413,6 @@ homomixes <- function(sp, mix1=NULL){
 #'
 #' @export
 deSpikein.compare <- function(d,quantification,norm="",method=""){
-
   data("ercc")
   if("DQ459412" %in% row.names(d)){
     # transcript names

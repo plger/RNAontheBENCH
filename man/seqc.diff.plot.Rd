@@ -20,7 +20,7 @@ seqc.diff.plot(ps, xlim = c(0, 60), ylimAB = c(15000, 19000),
 Produces 4 plots and returns a list of accuracy values for each test
 }
 \description{
-Produces a combination of 'positives plot' (see 'posplot') for a list of differential expression calls on the SEQC data.
+Produces a combination of 'positives plot' (see \code{\link{posplot}}) for a list of differential expression calls on the SEQC data.
 The x/ylim parameters control the 'zoomed plots'; the default settings are good for gene-level using all replicates.
 For gene-level with only 3 samples/group, use:
  xlim=c(0,60), ylimAB=c(5000,15500), ylimCD=c(2000,12000)

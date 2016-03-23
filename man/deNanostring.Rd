@@ -26,7 +26,8 @@ Runs a differential expression analysis and compares it to a log-t-test performe
 }
 \examples{
 data(exampledata)
-deNanostring(exampleGeneLevel, method="edgeR", norm="TMM", quantification="Tophat-featureCounts")
+deNanostring(exampleGeneLevel, method="edgeR", norm="TMM", 
+  quantification="Tophat-featureCounts")
 
 }
 

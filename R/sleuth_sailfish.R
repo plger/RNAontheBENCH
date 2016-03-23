@@ -1,14 +1,19 @@
+#' sleuth_prep_sailfish
+#'
 #' Constructor for a 'sleuth' object using sailfish data
 #'
-#' Converts sailfish results to kallisto HDF5
-#' format, then return the results of \code{\code{\link[sleuth]{sleuth_prep}}} on
-#' the converted data.
-#' TAKEN FROM SAILFISH/SALMON DEVELOPERS COMMIT ON THE SLEUTH GIT
+#' Converts sailfish results to kallisto HDF5 format, then return the 
+#' results of \code{\code{\link[sleuth]{sleuth_prep}}} on the
+#' converted data.
+#' TAKEN FROM SAILFISH/SALMON DEVELOPERS COMMIT ON THE SLEUTH GIT and provided
+#' as is; users are advised to double-check for updates on how to use salmon/sailfish
+#' data with sleuth.
 #'
 #' See \code{\code{\link[sleuth]{sleuth_prep}}} for parameters other than sf_dirs.
 #'
 #' @param sf_dirs a character vector of length greater than one where each
 #' string points to a sailfish output directory
+#'
 #' @export
 sleuth_prep_sailfish <- function(
   sf_dirs,
@@ -40,7 +45,10 @@ sleuth_prep_sailfish <- function(
 }
 
 #' Convert sailfish results for one or more samples to kallisto HDF5
-#' TAKEN FROM SAILFISH/SALMON DEVELOPERS COMMIT ON THE SLEUTH GIT
+#'
+#' TAKEN FROM SAILFISH/SALMON DEVELOPERS COMMIT ON THE SLEUTH GIT and provided
+#' as is; users are advised to double-check for updates on how to use salmon/sailfish
+#' data with sleuth.
 #'
 #' @param sf_dirs a character vector of length greater than one where each
 #' string points to a sailfish output directory
@@ -51,7 +59,10 @@ package_sf_as_kal <- function(sf_dirs) {
 }
 
 #' Convert sailfish results for one sample to kallisto HDF5
-#' TAKEN FROM SAILFISH/SALMON DEVELOPERS COMMIT ON THE SLEUTH GIT
+#'
+#' TAKEN FROM SAILFISH/SALMON DEVELOPERS COMMIT ON THE SLEUTH GIT and provided
+#' as is; users are advised to double-check for updates on how to use salmon/sailfish
+#' data with sleuth.
 #'
 #' @param sf_dir path to a sailfish output directory
 #' @export

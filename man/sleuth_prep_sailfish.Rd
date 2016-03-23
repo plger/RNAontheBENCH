@@ -2,7 +2,7 @@
 % Please edit documentation in R/sleuth_sailfish.R
 \name{sleuth_prep_sailfish}
 \alias{sleuth_prep_sailfish}
-\title{Constructor for a 'sleuth' object using sailfish data}
+\title{sleuth_prep_sailfish}
 \usage{
 sleuth_prep_sailfish(sf_dirs, sample_to_covariates, full_model,
   filter_fun = basic_filter, target_mapping = NULL, max_bootstrap = NULL,
@@ -13,12 +13,16 @@ sleuth_prep_sailfish(sf_dirs, sample_to_covariates, full_model,
 string points to a sailfish output directory}
 }
 \description{
-Converts sailfish results to kallisto HDF5
-format, then return the results of \code{\code{\link[sleuth]{sleuth_prep}}} on
-the converted data.
-TAKEN FROM SAILFISH/SALMON DEVELOPERS COMMIT ON THE SLEUTH GIT
+Constructor for a 'sleuth' object using sailfish data
 }
 \details{
+Converts sailfish results to kallisto HDF5 format, then return the 
+results of \code{\code{\link[sleuth]{sleuth_prep}}} on the
+converted data.
+TAKEN FROM SAILFISH/SALMON DEVELOPERS COMMIT ON THE SLEUTH GIT and provided
+as is; users are advised to double-check for updates on how to use salmon/sailfish
+data with sleuth.
+
 See \code{\code{\link[sleuth]{sleuth_prep}}} for parameters other than sf_dirs.
 }
 

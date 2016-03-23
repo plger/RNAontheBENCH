@@ -5,10 +5,10 @@
 \title{Runs a spike-in differential expression analysis.}
 \usage{
 deSpikein(dat, method = "edgeR", norm = "TMM", quantification = "",
-  homogenize.mixes = T, saveResults = F, savePlot = F)
+  homogenize.mixes = T, saveResults = F, savePlot = F, mix1 = NULL)
 }
 \arguments{
-\item{dat}{The expression matrix or data.frame, with gene symbols or transcript Refseq IDs as row.names, and sample names as column headers.}
+\item{dat}{The counts matrix or data.frame, with gene symbols or transcript Refseq IDs as row.names, and sample names as column headers.}
 
 \item{method}{The differential expression method to use. Either 'edgeR', 'DESeq', 'DESeq2', 'EBSeq', 'voom', 't' (t-test), or 'logt' (t-test on log-transformed values). A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").}
 
@@ -21,17 +21,21 @@ deSpikein(dat, method = "edgeR", norm = "TMM", quantification = "",
 \item{saveResults}{Logical, whether to save the results of the DEA in the current working directory (default FALSE).}
 
 \item{savePlot}{Logical, whether to save the plot in the current working directory (default FALSE).}
+
+\item{mix1}{A character vector indicating the column names of `dat` that have been spiked with mix 1. If you are using the SEQC data or the dataset at the basis of this package, leave this to NULL.}
 }
 \value{
 A data.frame with the results of the differential expression analysis, as well as a plot.
 }
 \description{
 Runs a differential expression analysis and compares it to real differences between spike-in mixes. 
-Sleuth is handled in a different function (see \code{\link{sleuthWrapper}})
+Sleuth is handled in a different function (see \code{\link{sleuthWrapper}})  
+A warning is given if the specified/expected mix distribution does not match the observed one.
 }
 \examples{
 data(exampledata)
-res <- deSpikein(exampleGeneLevel, method="edgeR", norm="TMM", quantification="Tophat-featureCounts")
+res <- deSpikein(exampleGeneLevel, method="edgeR", norm="TMM", 
+  quantification="Tophat-featureCounts")
 
 }
 

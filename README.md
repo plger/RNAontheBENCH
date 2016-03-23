@@ -58,11 +58,11 @@ You will need to download samples GSM1538995 through GSM1539007, and quantify th
 |AJ92 | GSM1539007 |
 |AJ93 | GSM1539008 |
 
-For reasons of comparability, we recommend using the NCBI GRCh38 genome, more specifically the sequence file `GCA_000001405.15_GRCh38_no_alt_analysis_set.fna` supplemented with the sequence of the ERCC spike-ins, and the corresponding gtf file also supplemented with the spike-in annotation.
+For reasons of comparability, we recommend using the NCBI GRCh38 genome, more specifically the sequence file `GCA_000001405.15_GRCh38_no_alt_analysis_set.fna` supplemented with the sequence of the ERCC spike-ins, and the corresponding gtf file also supplemented with the spike-in annotation. The spike-in sequences and .gtf annotation are available from <a href="http://www.thermofisher.com/order/catalog/product/4456739">the spike-ins' product page</a>.
 
 Keep in mind that the libraries are stranded (ISR in the Sailfish/Salmon nomenclature, fr-firststrand in the Tuxedo nomenclature).
 
-For the validation dataset, the samples are the following:
+For the validation dataset (optional), the samples are the following:
 
 | Sample name | GEO ID |
 |:------------|:-------|
@@ -81,7 +81,7 @@ The package expects expression matrices to have refseq ID or gene symbols as row
 
 Expression values can be read/fragments counts, FPKM, or TPM, and will be automically converted to TPM.
 
-If you do not provide a gene-level quantification, transcripts will automatically be summed to genes.
+If you do not provide a gene-level quantification, transcripts TPMs will automatically be summed to genes.
   
   
   
@@ -146,7 +146,7 @@ For differential expression methods which take a count matrix as input (e.g. edg
 
 ## Comparing differential expression calls to the Nanostring data
 
-To comapre differential expression calls to nanostring, you can simply use the `deNanostring()` function, providing your count matrix:
+To compare differential expression calls to nanostring, you can simply use the `deNanostring()` function, providing your count matrix:
 ```
 data(exampledata)
 deNanostring( exampleGeneLevel, method="edgeR", norm="TMM", 
@@ -181,7 +181,7 @@ The function returns the differential expression calls, and produces a figure wi
 * E: Error in estimated log2(foldchange) as a function of p-value.
 * F: P-values across the different (real) foldchanges between mixes.
 
-Of note, the function can take as input either the count data from the dataset used in this study, or from the SEQC data.
+Of note, the function can take as input either the count data from the dataset used in this study, from the SEQC data, or _from any data including the ERCC ExFold spike-ins_. If using your own data, you will have to provide the function with a `mix1` argument specifing the samples (i.e. column names) that haved been spiked with mix1 (see `?deSpikein` for more information).
 
 All the actual benchmarking and the generation of the plots is done by the function `deSpikein.compare()`, which is called by the `deSpikein()` function. This means that you can perform the analysis yourself, or import an external one (e.g. Cuffdiff), and pass it to the function. You simple need to make sure that the data is formatted as a data.frame with gene/transcript IDs are row.names, and with at least the columns "p" (for p-value), "log2FC" and "fdr". Note, however, that this will not used the 'homogenized spike-in normalization' (see below).
 
@@ -234,7 +234,13 @@ seqc.diff.example
 ![plot of chunk seqcDiffEG](vignettes/RNAontheBENCH_files/figure-html/seqcDiffEG-1.png)
 
 
-The function produces 4 plots, the right-hand ones being simply a zoom-in of the left ones. The top row represents the comparison between cell lines A and B, which the bottom row represents the comparison of C and D, which are two different mixtures of cell lines A and B. The results can be roughly read as a ROC curve, with the important caveat that true positives are simply assumed to be true.
+The function produces 4 plots, the right-hand ones being simply a zoom-in of the left ones. The top row represents the comparison between cell lines A and B, which the bottom row represents the comparison of C and D, which are two different mixtures of cell lines A and B. The results can be roughly read as a ROC curve, with the important caveat that true positives are simply assumed to be true. "X" indicates, for each curve, the 0.01 P-value (or otherwise specified in the function's call).
 
-Of note, the cell lines are _very_ different from one another, and the high degree of replication makes this a rather simple task for differential expression analysis. For this reason, we would recommend concentrating on the (slightly more subtle) C vs D comparison, and eventually to reduce the number of replicates used. This can all be done using the `between.groups` and `inner.groups` paramters of the `seqc.diff()` and `seqc.diff.example()` functions (see `?seqc.diff`). The default parameter values `between.groups=1:5, inner.groups=list(c(1,2,3),c(4,5))` indicate that replicates 1 to 5 will be used for comparison between groups, while for comparison within group replicates c(1,2,3) will be compared to replicates c(4,5) in each group.
+Of note, the cell lines are _very_ different from one another, and the high degree of replication makes this a rather simple task for differential expression analysis. For this reason, we recommend interpreting these results with care, concentrating on the (slightly more subtle) C vs D comparison, and eventually reducing the number of replicates used. This can all be done using the `between.groups` and `inner.groups` paramters of the `seqc.diff()` and `seqc.diff.example()` functions (see `?seqc.diff`). The default parameter values `between.groups=1:5, inner.groups=list(c(1,2,3),c(4,5))` indicate that replicates 1 to 5 will be used for comparison between groups, while for comparison within group replicates c(1,2,3) will be compared to replicates c(4,5) in each group.
   
+  
+  
+  
+# Reporting issues
+
+Please report issues on the <a href="https://github.com/plger/RNAontheBENCH">github repository</a>.

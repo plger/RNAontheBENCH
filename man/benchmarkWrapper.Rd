@@ -14,20 +14,20 @@ benchmarkWrapper(rpath, ANALYSIS_NAME, qt)
 \item{qt}{A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").}
 }
 \value{
-Nothing but saves a bunch of files in 'rpath'.
+Nothing, but saves a bunch of files in 'rpath' and opens an html page to browse the results.
 }
 \description{
-Performs the whole series of benchmark analysis (see \code{\link{txLevel}}, \code{\link{compareWithNanostring}}, \code{\link{analyzeSpikein}}, \code{\link{compareWithPCR}}, and \code{\link{compareSimulated}}).
+Performs the whole series of benchmark analysis (see \code{\link{compareWithNanostring}}, \code{\link{analyzeSpikein}}, \code{\link{compareWithPCR}}, and \code{\link{compareSimulated}}).
 The function expects quantification files with the right column headers ("AJ80" and so on, or "s1","s2" and so on for the simulated data) to be in the rpath folder, and to bear some kind of recognizable name.
-To avoid confusion, we suggest using the filename 'transcripts.quant' for transcript-level quantification, 'genes.quant' for gene-level quantification (optional), and 'simulated.quant' for transcript-level quantification of the simulated dataset (optional).
-If you want to specify files manually, use the individual underlying functions.
+However, to avoid confusion, we suggest using the filename 'transcripts.quant' for transcript-level quantification, 'genes.quant' for gene-level quantification (optional), and 'simulated.quant' for transcript-level quantification of the simulated dataset (optional). If you are benchmarking both the core (12-samples) dataset and the validation (6-samples) dataset, prefix the files with, respectively, 'w12.' and 'w6.' (see example below).
+If you instead want to specify files manually, use the individual underlying functions.
 }
 \examples{
 # first we create a directory and put the example quantification file in it:
 data(exampledata)
 dir.create("example")
-write.table(exampleTranscriptLevel,"w12.transcripts.quant",col.names=T,row.names=T,sep="\\t",quote=F)
-write.table(exampleGeneLevel,"w12.genes.quant",col.names=T,row.names=T,sep="\\t",quote=F)
+write.table(exampleTranscriptLevel,"w12.transcripts.quant",sep="\\t",quote=F)
+write.table(exampleGeneLevel,"w12.genes.quant",sep="\\t",quote=F)
 # run the wrapper, specifying that folder:
 benchmarkWrapper("example", "tophat.featureCount", qt="COUNTS")
 

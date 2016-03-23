@@ -22,4 +22,14 @@ Nothing, but produces many files in the working directory...
 Loads and processes the RNAseq data before comparing it with the Nanostring quantification. 
 Will produce a number of benchmarking plots and files in the current working directory.
 }
+\examples{
+# first we create a directory and put the example quantification file in it:
+data(exampledata)
+dir.create("example")
+write.table(exampleGeneLevel,"w12.genes.quant",sep="\\t",quote=F)
+# then we run the function, giving a name to the analysis, 
+# specifying the file and type of quantification:
+compareWithNanostring("tophat.featureCount", "w12.genes.quant", qt="COUNTS")
+
+}
 

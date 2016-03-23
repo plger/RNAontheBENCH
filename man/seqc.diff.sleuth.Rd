@@ -14,7 +14,7 @@ seqc.diff.sleuth(folders, between.groups = 1:5, inner.groups = list(c(1, 2,
 
 \item{inner.groups}{A list of two vectors, each containing the replicates to be used for comparison inside each condition. Default list(c(1,2,3),c(4,5)).}
 
-\item{do.plot}{Logical, whether to produce Positives plots (see posplot). Default TRUE.}
+\item{do.plot}{Logical, whether to produce Positives plots (see \code{\link{posplot}}). Default TRUE.}
 }
 \value{
 A list of differential expression calls.

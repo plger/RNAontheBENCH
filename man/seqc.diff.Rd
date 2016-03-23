@@ -29,6 +29,6 @@ A list of differential expression calls.
 \description{
 Runs a comparison of differential expression calls on the SEQC data, comparing calls across conditions to calls within conditions. 
 The assumption here (and made by the SEQC consortium) is that differential expression across replicates are false positives.
-See 'seqc.diff.example' for an example usage.
+See \code{\link{seqc.diff.example}} for an example usage.
 }
 

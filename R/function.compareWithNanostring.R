@@ -10,6 +10,15 @@
 #'
 #' @return Nothing, but produces many files in the working directory...
 #'
+#' @examples
+#' # first we create a directory and put the example quantification file in it:
+#' data(exampledata)
+#' dir.create("example")
+#' write.table(exampleGeneLevel,"w12.genes.quant",sep="\t",quote=F)
+#' # then we run the function, giving a name to the analysis, 
+#' # specifying the file and type of quantification:
+#' compareWithNanostring("tophat.featureCount", "w12.genes.quant", qt="COUNTS")
+#'
 #' @export
 compareWithNanostring <- function(ANALYSIS_NAME, rnaseq=NULL, qt, normMethod=NULL){
   qt <- match.arg(toupper(qt),c("FPKM","TPM","COUNTS"))
@@ -36,6 +45,7 @@ compareWithNanostring <- function(ANALYSIS_NAME, rnaseq=NULL, qt, normMethod=NUL
       normMethod <- "TMM"
     }
   }
+  message(paste("Normalization method:",normMethod))
   
   if(dinf$dataset == "w12"){
     data("w12_nanostring")
@@ -55,7 +65,7 @@ compareWithNanostring <- function(ANALYSIS_NAME, rnaseq=NULL, qt, normMethod=NUL
     nanoprobes <- nanoprobes[row.names(na),]    
   }
   na <- na[,dinf$samples]
-     
+
   if(qt=="COUNTS"){
     # values are counts - we first convert to FPKM
     ra <- counts2fpkmWrapper(ra,dinf$level)
@@ -65,7 +75,6 @@ compareWithNanostring <- function(ANALYSIS_NAME, rnaseq=NULL, qt, normMethod=NUL
     for(i in 1:ncol(ra))	ra[,i] <- fpkm2tpm(ra[,i])
     qt <- "TPM"
   }
-
   ra <- donorm(ra[,unique(names(ra))], normMethod)
 
   if(dinf$level=="transcript"){
@@ -83,6 +92,8 @@ compareWithNanostring <- function(ANALYSIS_NAME, rnaseq=NULL, qt, normMethod=NUL
   na <- na[genes,]
   rn <- rn[genes,]
 
+  if(any(colSums(rn)==0))   stop("Some of the samples appear to have no non-null quantifications!")
+  
   op <- options(warn=-1)
   on.exit(options(op))
   

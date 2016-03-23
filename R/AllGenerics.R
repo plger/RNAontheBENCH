@@ -240,21 +240,24 @@ getLinearNormalizers <- function(dataset, tryrobust=F){
 plTryRead <- function(patterns){
   for(p in patterns){
     tmp <- list.files(pattern=p)
-    if(length(tmp)>0) return(read.delim(tmp[[1]],header=T,row.names=1))
+    if(length(tmp)>0){
+        message(paste("Attempting to read quantification from file:",tmp))
+        return(read.delim(tmp[[1]],header=T,row.names=1))
+    }
   }
   return(NULL)
 }
 
 # load the transcript-level quantification file
 .getTxQt <- function(){
-  tmp <- plTryRead(c("transcripts.quant", "isoforms.fpkm_table", "transcript.counts", "transcript.fpkm", "transcript.tpm", "transcripts.tpm", "transcripts.fpkm","tpm$"));
+  tmp <- plTryRead(c("transcripts.quant", "transcript.quant", "transcript.counts", "transcript.fpkm", "transcript.tpm", "transcripts.tpm", "transcripts.fpkm","isoforms.fpkm_table","tpm$"));
   if(!is.null(tmp))	return(tmp)
   stop("Could not find RNA-seq quantification file.")
 }
 
 # load the gene-level quantification file
 .getGeneQt <- function(){
-  tmp <- plTryRead(c("genes.quant", "genes.fpkm_table", "gene.counts", "gene.fpkm", "gene.tpm", "genes.tpm"));
+  tmp <- plTryRead(c("genes.quant", "gene.quant", "gene.counts", "gene.fpkm", "genes.fpkm", "gene.tpm", "genes.tpm", "genes.fpkm_table"));
   if(!is.null(tmp))	return(tmp)
   message("Could not find the gene-level RNA-seq quantification file. Trying to build it by summing transcripts.")
   return(convertTx2Genes(.getTxQt()))
@@ -496,23 +499,23 @@ simStats <- function(x,y,ANALYSIS_NAME, fname,clean=T,norm=F,incZeros=F){
 
 #' A wrapper that performs the whole benchmark analysis
 #'
-#' Performs the whole series of benchmark analysis (see \code{\link{txLevel}}, \code{\link{compareWithNanostring}}, \code{\link{analyzeSpikein}}, \code{\link{compareWithPCR}}, and \code{\link{compareSimulated}}).
+#' Performs the whole series of benchmark analysis (see \code{\link{compareWithNanostring}}, \code{\link{analyzeSpikein}}, \code{\link{compareWithPCR}}, and \code{\link{compareSimulated}}).
 #' The function expects quantification files with the right column headers ("AJ80" and so on, or "s1","s2" and so on for the simulated data) to be in the rpath folder, and to bear some kind of recognizable name.
-#' To avoid confusion, we suggest using the filename 'transcripts.quant' for transcript-level quantification, 'genes.quant' for gene-level quantification (optional), and 'simulated.quant' for transcript-level quantification of the simulated dataset (optional).
-#' If you want to specify files manually, use the individual underlying functions.
+#' However, to avoid confusion, we suggest using the filename 'transcripts.quant' for transcript-level quantification, 'genes.quant' for gene-level quantification (optional), and 'simulated.quant' for transcript-level quantification of the simulated dataset (optional). If you are benchmarking both the core (12-samples) dataset and the validation (6-samples) dataset, prefix the files with, respectively, 'w12.' and 'w6.' (see example below).
+#' If you instead want to specify files manually, use the individual underlying functions.
 #'
 #' @param rpath The path were the quantification files are stored, and where the output files will be saved.
 #' @param ANALYSIS_NAME The name of the analysis pipeline
 #' @param qt A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").
 #'
-#' @return Nothing but saves a bunch of files in 'rpath'.
+#' @return Nothing, but saves a bunch of files in 'rpath' and opens an html page to browse the results.
 #'
 #' @examples
 #' # first we create a directory and put the example quantification file in it:
 #' data(exampledata)
 #' dir.create("example")
-#' write.table(exampleTranscriptLevel,"w12.transcripts.quant",col.names=T,row.names=T,sep="\t",quote=F)
-#' write.table(exampleGeneLevel,"w12.genes.quant",col.names=T,row.names=T,sep="\t",quote=F)
+#' write.table(exampleTranscriptLevel,"w12.transcripts.quant",sep="\t",quote=F)
+#' write.table(exampleGeneLevel,"w12.genes.quant",sep="\t",quote=F)
 #' # run the wrapper, specifying that folder:
 #' benchmarkWrapper("example", "tophat.featureCount", qt="COUNTS")
 #'
@@ -643,7 +646,7 @@ benchmarkWrapper <- function(rpath, ANALYSIS_NAME, qt){
             di[["samples"]] <- paste(rep(LETTERS[1:2],each=5),rep(1:5,4),sep="_")
             di[["dataset"]] <- "seqc"
           }else{
-            stop("Could not identify the dataset. Make sure that the column names are as they should be.")
+            stop("Could not identify the dataset. Make sure that the column names are as they should be. Alternatively, if the file to use was not specified, it might have been incorrectly guessed; consider specifying it (or, if you are using the benchmarkWrapper() function, renaming your files as specified in ?benchmarkWrapper )")
           }
 	}
       }

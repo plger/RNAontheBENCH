@@ -19,7 +19,7 @@ seqc.diff.example(e = NULL, site = "BGI", tests = c("edgeR", "voom",
 
 \item{inner.groups}{A list of two vectors, each containing the replicates to be used for comparison inside each condition. Default list(c(1,2,3),c(4,5)).}
 
-\item{do.plot}{Logical, whether to produce Positives plots (see posplot). Default TRUE.}
+\item{do.plot}{Logical, whether to produce Positives plots (see \code{\link{posplot}}). Default TRUE.}
 
 \item{returnData}{Logical, whether to return the resulting data.}
 }
@@ -27,6 +27,6 @@ seqc.diff.example(e = NULL, site = "BGI", tests = c("edgeR", "voom",
 Produces a plot, and returns a list if returnData=T.
 }
 \description{
-Compares differential expression analysis (DEA) methods using the 'diff.seqc' function, and produces ROC-like plots.
+Compares differential expression analysis (DEA) methods using the \code{\link{diff.seqc}} function, and produces ROC-like plots.
 }
 

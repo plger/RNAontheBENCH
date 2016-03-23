@@ -2,8 +2,7 @@
 % Please edit documentation in R/sleuth_sailfish.R
 \name{package_sf_as_kal}
 \alias{package_sf_as_kal}
-\title{Convert sailfish results for one or more samples to kallisto HDF5
-TAKEN FROM SAILFISH/SALMON DEVELOPERS COMMIT ON THE SLEUTH GIT}
+\title{Convert sailfish results for one or more samples to kallisto HDF5}
 \usage{
 package_sf_as_kal(sf_dirs)
 }
@@ -12,7 +11,8 @@ package_sf_as_kal(sf_dirs)
 string points to a sailfish output directory}
 }
 \description{
-Convert sailfish results for one or more samples to kallisto HDF5
-TAKEN FROM SAILFISH/SALMON DEVELOPERS COMMIT ON THE SLEUTH GIT
+TAKEN FROM SAILFISH/SALMON DEVELOPERS COMMIT ON THE SLEUTH GIT and provided
+as is; users are advised to double-check for updates on how to use salmon/sailfish
+data with sleuth.
 }
 

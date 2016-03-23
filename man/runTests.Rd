@@ -21,6 +21,7 @@ runTests(data, groups, norm = "TMM", de = "edgeR", homogenize.mixes = T)
 A data.frame with the results of the differential expression analysis.
 }
 \description{
-Runs a differential expression analysis using the selected method. This is used by the \code{\link{differentialExpression}} function.
+Runs a differential expression analysis using the selected method. This is used by the \code{\link{differentialExpression}} function. 
+This is simply a wrapper to make sure that the different analysis methods use the same normalization method and return results in the same format.
 }
 

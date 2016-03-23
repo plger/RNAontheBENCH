@@ -9,7 +9,7 @@ analyzeSpikein(ANALYSIS_NAME, rnaseq = NULL, qt, fc.undetected = 1)
 \arguments{
 \item{ANALYSIS_NAME}{A string indicating the name of the analysis/pipeline. Will be used in filenames, plot titles, etc.}
 
-\item{rnaseq}{The path to the gene-level RNAseq expression matrix. If not given, will look for relevant files in the working directory. The expression matrix should have gene symbols in the first column/row.names, and sample names (e.g. 'AJ80', etc) as column headers.}
+\item{rnaseq}{The path to the gene-level RNAseq expression matrix. If not given, will look for relevant files in the working directory. The expression matrix should have gene symbols in the first column/row.names, and sample names (e.g. 'AJ80' for the 12-samples dataset, "A_1" for SEQC, etc) as column headers.}
 
 \item{qt}{A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").}
 
@@ -21,5 +21,15 @@ Nothing, but produces many files in the working directory...
 \description{
 Loads and processes the RNAseq data before comparing it with the spike-in concentrations.
 Will produce a number of benchmarking plots and files in the current working directory.
+}
+\examples{
+# first we create a directory and put the example quantification file in it:
+data(exampledata)
+dir.create("example")
+write.table(exampleGeneLevel,"w12.genes.quant",sep="\\t",quote=F)
+# then we run the function, giving a name to the analysis, 
+# specifying the file and type of quantification:
+analyzeSpikein("tophat.featureCount", "w12.genes.quant", qt="COUNTS")
+
 }
 

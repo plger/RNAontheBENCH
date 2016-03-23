@@ -15,6 +15,6 @@ seqc.prepareData(site = "BGI", removeERCC = T)
 A data.frame of counts, with gene symbols as row.names.
 }
 \description{
-Fetches and prepare SEQC data using the seqc package.
+Fetches and prepare SEQC data using the \code{\link{seqc}} package.
 }
 
