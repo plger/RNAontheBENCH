@@ -11,7 +11,7 @@ runTests(data, groups, norm = "TMM", de = "edgeR", homogenize.mixes = T)
 
 \item{groups}{A logical vector (or coercible to logical) of length ncol(data), indicating to which group each sample (i.e. column in 'data') belongs. There can be only two groups.}
 
-\item{norm}{The normalization method to use (see \code{\link{donorm}}). Defaults to 'TMM'.}
+\item{norm}{The normalization method to use (either "linear", or any of the methods supported by edgeR's \code{\link[edgeR]{calcNormFactors}}. Defaults to 'TMM'.}
 
 \item{de}{The differential expression method to use. Either 'edgeR', 'DESeq', 'DESeq2', 'EBSeq', 'voom', 't' (t-test), or 'logt' (t-test on log-transformed values). A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").}
 

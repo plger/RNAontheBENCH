@@ -12,7 +12,7 @@ deNanostring(rnaseq = NULL, method = "edgeR", norm = "TMM",
 
 \item{method}{The differential expression method to use. Either 'edgeR', 'DESeq', 'DESeq2', 'EBSeq', 'voom', 't' (t-test), or 'logt' (t-test on log-transformed values).}
 
-\item{norm}{The normalization method to use (see \code{\link{donorm}}). Defaults to 'TMM'.}
+\item{norm}{The normalization method to use (either "linear", or any of the methods supported by edgeR's \code{\link[edgeR]{calcNormFactors}}. Defaults to 'TMM'.}
 
 \item{quantification}{A string indicating the quantification that was used to produce the expression matrix (use for labeling)}
 

@@ -219,10 +219,10 @@ plColorMap <- function(x){
 #'
 #' @export
 getLinearNormalizers <- function(dataset, tryrobust=F){
-  normBy <- as.numeric(dataset[,1])
-  co <- c(1,apply(dataset[,2:ncol(dataset)],2,FUN=function(x){ mod <- plGetModel(x,normBy,tryrobust=tryrobust); suppressWarnings(if(is.na(mod)) return(NA)); as.numeric(coef(mod)[[1]])}))
+  normBy <- apply(dataset,1,na.rm=T,FUN=median)
+  co <- apply(dataset[,1:ncol(dataset)],2,FUN=function(x){ mod <- plGetModel(x,normBy,tryrobust=tryrobust); suppressWarnings(if(is.na(mod)) return(NA)); as.numeric(coefficients(mod)[[1]])})
   names(co) <- colnames(dataset)
-  co
+  co/exp(mean(log(co)))
 }
 
 #' plTryRead

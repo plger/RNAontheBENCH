@@ -13,7 +13,7 @@
 #'
 #' @param dat The counts matrix or data.frame, with gene symbols or transcript Refseq IDs as row.names, and sample names as column headers.
 #' @param method The differential expression method to use. Either 'edgeR', 'DESeq', 'DESeq2', 'EBSeq', 'voom', 't' (t-test), or 'logt' (t-test on log-transformed values). A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").
-#' @param norm The normalization method to use (see \code{\link{donorm}}). Defaults to 'TMM'.
+#' @param norm The normalization method to use (either "linear", or any of the methods supported by edgeR's \code{\link[edgeR]{calcNormFactors}}. Defaults to 'TMM'.
 #' @param quantification A string indicating the name of the analysis/pipeline form which the quantification comes. Will be used in filenames, plot titles, etc.
 #' @param homogenize.mixes logical, whether the two spike-in mixes should be homogenized for the purpose of calculating normalization factors.
 #' @param saveResults Logical, whether to save the results of the DEA in the current working directory (default FALSE).
@@ -96,7 +96,7 @@ deSpikein <- function(dat, method="edgeR", norm="TMM", quantification="", homoge
 #'
 #' @param rnaseq Either the (gene-level) count matrix, or a character indicating the location of the file.
 #' @param method The differential expression method to use. Either 'edgeR', 'DESeq', 'DESeq2', 'EBSeq', 'voom', 't' (t-test), or 'logt' (t-test on log-transformed values).
-#' @param norm The normalization method to use (see \code{\link{donorm}}). Defaults to 'TMM'.
+#' @param norm The normalization method to use (either "linear", or any of the methods supported by edgeR's \code{\link[edgeR]{calcNormFactors}}. Defaults to 'TMM'.
 #' @param quantification A string indicating the quantification that was used to produce the expression matrix (use for labeling)
 #' @param threshold The p-value threshold applied on the Nanostring data to identify whether a gene is differentially-expressed or not.
 #'
@@ -199,7 +199,7 @@ deNanostring.compare <- function(results, method, norm, quantification="", thres
 #'
 #' @param name A string indicating the name of the analysis/pipeline form which the quantification comes. Will be used in filenames, plot titles, etc.
 #' @param folder A character vector containing the path to the Salmon/Sailfish/Kallisto quantification folders. If missing, will look for names matching "AJ" in the current working directory.
-#' @param norm The normalization method to use (see \code{\link{donorm}}). Defaults to 'TMM'.
+#' @param norm The normalization method to use (either "linear", or any of the methods supported by edgeR's \code{\link[edgeR]{calcNormFactors}}. Defaults to 'TMM'.
 #' @param savePlot Logical, whether to save the plot in the current working directory (default TRUE).
 #'
 #' @return A data.frame with the results of the differential expression analysis, as well as a plot.
@@ -292,7 +292,7 @@ sleuthWrapper <- function(name, folders=NULL, norm="TMM", savePlot=F){
 #'
 #' @param data The expression matrix or data.frame, with gene symbols or transcript Refseq IDs as row.names.
 #' @param groups A logical vector (or coercible to logical) of length ncol(data), indicating to which group each sample (i.e. column in 'data') belongs. There can be only two groups.
-#' @param norm The normalization method to use (see \code{\link{donorm}}). Defaults to 'TMM'.
+#' @param norm The normalization method to use (either "linear", or any of the methods supported by edgeR's \code{\link[edgeR]{calcNormFactors}}. Defaults to 'TMM'.
 #' @param de The differential expression method to use. Either 'edgeR', 'DESeq', 'DESeq2', 'EBSeq', 'voom', 't' (t-test), or 'logt' (t-test on log-transformed values). A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").
 #' @param homogenize.mixes logical, whether the two spike-in mixes should be homogenized for the purpose of calculating normalization factors.
 #'
@@ -313,7 +313,6 @@ runTests <- function(data, groups, norm="TMM", de="edgeR", homogenize.mixes=T){
   }
   nf <- switch(norm,
       "linear"=getLinearNormalizers(z),
-      "median"=MedianNorm(z),
       calcNormFactors(z,method=norm))
  if(de=="t" | de=="logt"){
     data <- t(t(data)/nf)

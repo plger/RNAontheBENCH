@@ -12,7 +12,7 @@ deSpikein(dat, method = "edgeR", norm = "TMM", quantification = "",
 
 \item{method}{The differential expression method to use. Either 'edgeR', 'DESeq', 'DESeq2', 'EBSeq', 'voom', 't' (t-test), or 'logt' (t-test on log-transformed values). A string indicating the unit of the expression matrix (either "FPKM", "TPM" or "COUNTS").}
 
-\item{norm}{The normalization method to use (see \code{\link{donorm}}). Defaults to 'TMM'.}
+\item{norm}{The normalization method to use (either "linear", or any of the methods supported by edgeR's \code{\link[edgeR]{calcNormFactors}}. Defaults to 'TMM'.}
 
 \item{quantification}{A string indicating the name of the analysis/pipeline form which the quantification comes. Will be used in filenames, plot titles, etc.}
 

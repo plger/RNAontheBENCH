@@ -147,7 +147,7 @@ Then we call the function, specifying that the expression values are counts:
 benchmarkWrapper("example", "tophat.featureCount", qt="counts")
 ```
 
-A number of files will be saved in the "example" folder, including an html file allowing to browse these results.
+A number of files will be saved in the "example" folder, including an html file allowing to browse these results. These results are the same that can be browsed on the <a href="https://bio.ieo.eu/rnaseqBenchmark/">online platform</a>.
   
   
   
