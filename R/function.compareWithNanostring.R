@@ -14,7 +14,7 @@
 #' # first we create a directory and put the example quantification file in it:
 #' data(exampledata)
 #' dir.create("example")
-#' write.table(exampleGeneLevel,"w12.genes.quant",sep="\t",quote=F)
+#' write.table(exampleGeneLevel,"w12.genes.quant",sep="\t",quote=FALSE)
 #' # then we run the function, giving a name to the analysis, 
 #' # specifying the file and type of quantification:
 #' compareWithNanostring("tophat.featureCount", "w12.genes.quant", qt="COUNTS")
@@ -276,7 +276,7 @@ compareWithNanostring <- function(ANALYSIS_NAME, rnaseq=NULL, qt, normMethod=NUL
     dev.off()
   }  
   
-  write.table(as.data.frame(sl),paste(dinf$fname,"stats",sep="."),col.names=T,row.names=F,sep="\t",quote=F)
+  write.table(as.data.frame(sl),paste(dinf$fname,"stats",sep="."),col.names=TRUE,row.names=FALSE,sep="\t",quote=FALSE)
     
 }
  

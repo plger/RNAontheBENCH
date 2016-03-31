@@ -3,13 +3,13 @@
 #' Constructor for a 'sleuth' object using sailfish data
 #'
 #' Converts sailfish results to kallisto HDF5 format, then return the 
-#' results of \code{\code{\link[sleuth]{sleuth_prep}}} on the
+#' results of \code{\link[sleuth]{sleuth_prep}} on the
 #' converted data.
 #' TAKEN FROM SAILFISH/SALMON DEVELOPERS COMMIT ON THE SLEUTH GIT and provided
 #' as is; users are advised to double-check for updates on how to use salmon/sailfish
 #' data with sleuth.
 #'
-#' See \code{\code{\link[sleuth]{sleuth_prep}}} for parameters other than sf_dirs.
+#' See \code{\link[sleuth]{sleuth_prep}} for parameters other than sf_dirs.
 #'
 #' @param sf_dirs a character vector of length greater than one where each
 #' string points to a sailfish output directory
@@ -85,7 +85,7 @@ sf_to_hdf5 <- function(sf_dir) {
   bootspath <- file.path(sf_dir, 'quant_bootstraps.sf')
   numBoot <- 0
   if (file.exists(bootspath)) {
-    boots <- read.table(bootspath,header=T,stringsAsFactors=F)
+    boots <- read.table(bootspath,header=TRUE,stringsAsFactors=FALSE)
     target_ids <- names(boots)
     boots <- data.table(t(boots))
     setnames(boots, sapply(0:(ncol(boots)-1), function(i) paste('bs', i, sep='')))

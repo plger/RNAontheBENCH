@@ -6,7 +6,7 @@
 \usage{
 seqc.diff.example(e = NULL, site = "BGI", tests = c("edgeR", "voom",
   "DESeq2"), between.groups = 1:5, inner.groups = list(c(1, 2, 3), c(4, 5)),
-  do.plot = T, returnData = F)
+  do.plot = TRUE, returnData = FALSE)
 }
 \arguments{
 \item{e}{The count matrix or data.frame. Anything can be used as row names (e.g. gene symbols, transcript ids...). If NULL, the 'site' parameter is used to fetch the quantification from the seqc package (if installed).}
@@ -24,7 +24,7 @@ seqc.diff.example(e = NULL, site = "BGI", tests = c("edgeR", "voom",
 \item{returnData}{Logical, whether to return the resulting data.}
 }
 \value{
-Produces a plot, and returns a list if returnData=T.
+Produces a plot, and returns a list if returnData=TRUE.
 }
 \description{
 Compares differential expression analysis (DEA) methods using the \code{\link{diff.seqc}} function, and produces ROC-like plots.

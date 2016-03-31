@@ -4,10 +4,10 @@
 \alias{posplot}
 \title{Positives plot}
 \usage{
-posplot(p, fp1, fp2 = NULL, subsamp = 200, pround = 2, add = F,
+posplot(p, fp1, fp2 = NULL, subsamp = 200, pround = 2, add = FALSE,
   xlab = "DEGs between replicates", ylab = "DEGs between conditions",
   main = "Positives plot", col = "black", xlim = NULL, ylim = NULL,
-  lwd = 3, lty = 1, auc.plotted = F)
+  lwd = 3, lty = 1, auc.plotted = FALSE)
 }
 \arguments{
 \item{p}{A vector of p-values across conditions.}

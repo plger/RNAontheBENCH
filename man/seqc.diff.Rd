@@ -6,7 +6,7 @@
 \usage{
 seqc.diff(e = NULL, norm = "TMM", de = "edgeR", site = "BGI",
   between.groups = 1:5, inner.groups = list(c(1, 2, 3), c(4, 5)),
-  do.plot = T)
+  do.plot = TRUE)
 }
 \arguments{
 \item{e}{The count matrix or data.frame. Anything can be used as row names (e.g. gene symbols, transcript ids...). If NULL, the 'site' parameter is used to fetch the quantification from the seqc package (if installed).}

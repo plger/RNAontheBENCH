@@ -4,7 +4,7 @@
 \alias{seqc.prepareData}
 \title{seqc.prepareData}
 \usage{
-seqc.prepareData(site = "BGI", removeERCC = T)
+seqc.prepareData(site = "BGI", removeERCC = TRUE)
 }
 \arguments{
 \item{site}{Sequencing site, default BGI.}

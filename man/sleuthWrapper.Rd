@@ -4,7 +4,7 @@
 \alias{sleuthWrapper}
 \title{Runs a spike-in differential expression analysis using sleuth.}
 \usage{
-sleuthWrapper(name, folders = NULL, norm = "TMM", savePlot = F)
+sleuthWrapper(name, folders = NULL, norm = "TMM", savePlot = FALSE)
 }
 \arguments{
 \item{name}{A string indicating the name of the analysis/pipeline form which the quantification comes. Will be used in filenames, plot titles, etc.}

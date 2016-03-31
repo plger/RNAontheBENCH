@@ -14,7 +14,7 @@
 #' # first we create a directory and put the example quantification file in it:
 #' data(exampledata)
 #' dir.create("example")
-#' write.table(exampleGeneLevel,"w12.genes.quant",sep="\t",quote=F)
+#' write.table(exampleGeneLevel,"w12.genes.quant",sep="\t",quote=FALSE)
 #' # then we run the function, giving a name to the analysis, 
 #' # specifying the file and type of quantification:
 #' analyzeSpikein("tophat.featureCount", "w12.genes.quant", qt="COUNTS")
@@ -27,7 +27,7 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
   if(is.null(rnaseq)){
     sp <- .getSpikeinQt()
   }else{
-    sp <- read.delim(rnaseq,header=T,row.names=1)
+    sp <- read.delim(rnaseq,header=TRUE,row.names=1)
     if("DQ854994" %in% row.names(sp))   sp <- .getSpikeinsFromTranscripts(sp)
   }
   dinf <- .checkDataset(sp, ANALYSIS_NAME)
@@ -44,7 +44,7 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
 
   if(qt=="COUNTS"){
     # values are counts - we first convert to FPKM
-    sp <- counts2fpkmWrapper(sp,dinf$level,uniquelyMappableLengths=F)
+    sp <- counts2fpkmWrapper(sp,dinf$level,uniquelyMappableLengths=FALSE)
     qt <- "FPKM"
   }  
   if(qt != "TPM"){
@@ -53,7 +53,7 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
   }
 
   # ensure that all spike-ins are there, set to 0 the missing ones
-  sp <- merge(sp,ercc,by="row.names",all.y=T)[,1:(ncol(sp)+1)]
+  sp <- merge(sp,ercc,by="row.names",all.y=TRUE)[,1:(ncol(sp)+1)]
   row.names(sp) <- sp$Row.names
   sp$Row.names <- NULL
   sp <- as.matrix(sp)
@@ -68,7 +68,7 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
   df <- data.frame(row.names=names(sp))
   df$mix1.cor <- apply(sp,2,FUN=function(x){ cor(as.numeric(x),as.numeric(ercc$concentration.in.Mix.1..attomoles.ul.))})
   df$mix2.cor <- apply(sp,2,FUN=function(x){ cor(as.numeric(x),as.numeric(ercc$concentration.in.Mix.2..attomoles.ul.))})
-  df$best.matching.mix <- apply(df,1,FUN=function(x){ order(as.numeric(x),decreasing=T)[1]})
+  df$best.matching.mix <- apply(df,1,FUN=function(x){ order(as.numeric(x),decreasing=TRUE)[1]})
 
   # renormalize samples according to their expected spike-in amounts, 
   # thereby avoiding discrepancies due to the different amounts of spike-ins put in the cells.
@@ -93,7 +93,7 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
   }
   df$expected.mix <- ifelse(row.names(df) %in% mix1, 1, 2)
   if(any(df$best.matching.mix != df$expected.mix)){
-    warning(paste(ANALYSIS_NAME,"There appears to be a problem with the spike-in quantification or normalization, because samples do not correlate with the correct spike-in mixes. This can happen with very poor quantifications, can be due to a mis-labeling of the columns, or wrong specification of the samples having mix1. Analysis will proceed, but you should double-check the samples' mix assignment:",sep=" - "),immediate.=T)
+    warning(paste(ANALYSIS_NAME,"There appears to be a problem with the spike-in quantification or normalization, because samples do not correlate with the correct spike-in mixes. This can happen with very poor quantifications, can be due to a mis-labeling of the columns, or wrong specification of the samples having mix1. Analysis will proceed, but you should double-check the samples' mix assignment:",sep=" - "),immediate.=TRUE)
     print(df)
   }
   
@@ -111,7 +111,7 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
     w <- which(x>0 & y>0)
     cor(x[w],y[w])
   })
-  write.table(sc,paste(dinf$fname,".perSampleCorrelation.tab",sep=""),col.names=T,row.names=T,sep="\t",quote=F)
+  write.table(sc,paste(dinf$fname,".perSampleCorrelation.tab",sep=""),col.names=TRUE,row.names=TRUE,sep="\t",quote=FALSE)
   
   x <- as.numeric(t(xdf))
   
@@ -125,12 +125,12 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
   sl[["cor.detected"]] <- cor(x[w],y[w],use="pairwise")
   sl[["log.cor.detected"]] <- cor(log10(x[w]),log10(y[w]),use="pairwise")
   sl[["cor.all"]] <- cor(x,y,use="pairwise")
-  sl[["cor.detected.abovemedian"]] <- try(cor(x[which(y>med)], y[which(y>med)],use="pairwise"),silent=T)
-  sl[["cor.detected.belowmedian"]] <- try(cor(x[which(y>0 & y<=med)], y[which(y>0 & y<=med)],use="pairwise"),silent=T)
+  sl[["cor.detected.abovemedian"]] <- try(cor(x[which(y>med)], y[which(y>med)],use="pairwise"),silent=TRUE)
+  sl[["cor.detected.belowmedian"]] <- try(cor(x[which(y>0 & y<=med)], y[which(y>0 & y<=med)],use="pairwise"),silent=TRUE)
   sl[["prop.undetected"]] <- 1-sum(spn>0)/ncol(spn)/92
   ww <- which(!as.logical(lapply(sl,FUN=is.numeric)))
   for(wo in ww) sl[[wo]] <- NA
-  simStats(x,y,dinf$ptitle,paste(dinf$fname,"expr",sep="."),norm=T)
+  simStats(x,y,dinf$ptitle,paste(dinf$fname,"expr",sep="."),norm=TRUE)
   
   # We can now plot the correlation between (normalized) FPKM and expected values
   samples_colors <- sapply(dinf$sample_colors, alpha=150, FUN=maketrans)
@@ -142,8 +142,8 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
 
   # we average the samples according to their mix, and calculate the observed foldchange between mixes
   d <- data.frame(expected=ercc$expected.fold.change.ratio)
-  d$avg.mix1=apply(spn[,df$expected.mix==1],1,na.rm=T,FUN=mean)
-  d$avg.mix2=apply(spn[,df$expected.mix==2],1,na.rm=T,FUN=mean)
+  d$avg.mix1=apply(spn[,df$expected.mix==1],1,na.rm=TRUE,FUN=mean)
+  d$avg.mix2=apply(spn[,df$expected.mix==2],1,na.rm=TRUE,FUN=mean)
   d$observed <- foldchange(d$avg.mix2,d$avg.mix1,fc.undetected)
   
   w <- isCleanData(d$observed,d$expected)
@@ -151,15 +151,15 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
   w <- isCleanData(log2(d$observed),log2(d$expected))
   sl[["cor.log2.foldchange"]] <- cor(log2(d$observed[w]), log2(d$expected[w]), use="pairwise")
 
-  simStats(d$observed,d$expected,dinf$ptitle,paste(dinf$fname,"foldchanges",sep="."),norm=F)
+  simStats(d$observed,d$expected,dinf$ptitle,paste(dinf$fname,"foldchanges",sep="."),norm=FALSE)
   
   # we calculate statistical significance of the difference between mixes
   pvals <- apply(spn, 1, FUN=function(x){ t.test(as.numeric(x[df$expected.mix==1]),as.numeric(x[df$expected.mix==2]))$p.value})
-  sl[["significant"]] <- sum(pvals < 0.05 & ercc$expected.fold.change.ratio != 1, na.rm=T)
-  sl[["false.positives"]] <- sum(pvals < 0.05 & ercc$expected.fold.change.ratio == 1, na.rm=T)
+  sl[["significant"]] <- sum(pvals < 0.05 & ercc$expected.fold.change.ratio != 1, na.rm=TRUE)
+  sl[["false.positives"]] <- sum(pvals < 0.05 & ercc$expected.fold.change.ratio == 1, na.rm=TRUE)
   
   # for plotting, we will color the transcripts according to their real concentration
-  genes_colors <- plColorMap(log10(rowMeans(ercc[,5:6],na.rm=T))) 
+  genes_colors <- plColorMap(log10(rowMeans(ercc[,5:6],na.rm=TRUE))) 
   
   # plot observed vs expected foldchanges
   png(paste(dinf$fname,"corFC.png",sep="."),width=500,height=500)
@@ -175,11 +175,11 @@ analyzeSpikein <- function(ANALYSIS_NAME, rnaseq=NULL, qt, fc.undetected=1){
   ld <- log2(d$expected)-log2(d$observed)
   png(paste(dinf$fname,"FC_deviations.png",sep="."),width=500,height=500)
   layout(matrix(1:2,nrow=2))
-  boxplot(ld,horizontal=T,xlab="Deviation in log2(Foldchange)",main=dinf$ptitle)
+  boxplot(ld,horizontal=TRUE,xlab="Deviation in log2(Foldchange)",main=dinf$ptitle)
   hist(ld[which(ld >-3 & ld < 3)],xlim=c(-3,3),breaks=seq(from=-3,to=3,by=0.2), main="", xlab="Deviation in log2(foldchange), excluding outliers")
   dev.off()
 
-  write.table(as.data.frame(sl),paste(dinf$fname,"stats",sep="."),col.names=T,row.names=F,sep="\t",quote=F)
+  write.table(as.data.frame(sl),paste(dinf$fname,"stats",sep="."),col.names=TRUE,row.names=FALSE,sep="\t",quote=FALSE)
 
 }
  

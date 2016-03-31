@@ -15,12 +15,12 @@
 #' @return A list of differential expression calls.
 #'
 #' @export
-seqc.diff <- function(e=NULL, norm="TMM", de="edgeR", site="BGI", between.groups=1:5, inner.groups=list(c(1,2,3),c(4,5)), do.plot=T){
+seqc.diff <- function(e=NULL, norm="TMM", de="edgeR", site="BGI", between.groups=1:5, inner.groups=list(c(1,2,3),c(4,5)), do.plot=TRUE){
     if(is.null(e)){
         e <- seqc.prepareData(site)
     }else{
         if(class(e)=="character"){
-            e <- read.delim(e,header=T,row.names=1)
+            e <- read.delim(e,header=TRUE,row.names=1)
         }
         colnames(e) <- gsub("_","",colnames(e))
         if(!all(colnames(e) %in% paste(rep(LETTERS[1:4],each=5),rep(1:5,4),sep=""))){
@@ -44,7 +44,7 @@ seqc.diff <- function(e=NULL, norm="TMM", de="edgeR", site="BGI", between.groups
     if(do.plot){
         message("# Producing plots")
         auc1 <- posplot(fp[["AvB"]]$p,fp[["A"]]$p,fp[["B"]]$p,col="blue")
-        auc2 <- posplot(fp[["CvD"]]$p,fp[["C"]]$p,fp[["D"]]$p,col="red",add=T)
+        auc2 <- posplot(fp[["CvD"]]$p,fp[["C"]]$p,fp[["D"]]$p,col="red",add=TRUE)
         legend("bottomright",bty="n",fill=c("blue","red"),legend=c(paste(c("A vs B (AUC:","C vs D (AUC:"),c(round(auc1,3),round(auc2,3)),")",sep="")))
     }
     return(fp)
@@ -63,9 +63,9 @@ seqc.diff <- function(e=NULL, norm="TMM", de="edgeR", site="BGI", between.groups
 #' @return A list of differential expression calls.
 #'
 #' @export
-seqc.diff.sleuth <- function(folders, between.groups=1:5, inner.groups=list(c(1,2,3),c(4,5)), do.plot=T){
+seqc.diff.sleuth <- function(folders, between.groups=1:5, inner.groups=list(c(1,2,3),c(4,5)), do.plot=TRUE){
     library(sleuth)
-    design <- data.frame(path=paste(rep(LETTERS[1:4],each=5),rep(1:5,4),sep="_"), mix=rep(c(1,2,NA,NA),each=5), cond=rep(LETTERS[1:4],each=5), rep=rep(1:5,4), stringsAsFactors=F)
+    design <- data.frame(path=paste(rep(LETTERS[1:4],each=5),rep(1:5,4),sep="_"), mix=rep(c(1,2,NA,NA),each=5), cond=rep(LETTERS[1:4],each=5), rep=rep(1:5,4), stringsAsFactors=FALSE)
     design$innerGroup <- relevel(as.factor(design$rep %in% inner.groups[[1]]),"FALSE")
     row.names(design) = design$sample = design$path
     fp <- list()
@@ -93,7 +93,7 @@ seqc.diff.sleuth <- function(folders, between.groups=1:5, inner.groups=list(c(1,
         message("")
         message("# Producing plots")
         auc1 <- posplot(fp[["AvB"]]$p,fp[["A"]]$p,fp[["B"]]$p,col="blue")
-        auc2 <- posplot(fp[["CvD"]]$p,fp[["C"]]$p,fp[["D"]]$p,col="red",add=T)
+        auc2 <- posplot(fp[["CvD"]]$p,fp[["C"]]$p,fp[["D"]]$p,col="red",add=TRUE)
         legend("bottomright",bty="n",fill=c("blue","red"),legend=c(paste(c("A vs B (AUC:","C vs D (AUC:"),c(round(auc1,3),round(auc2,3)),")",sep="")))
     }
     return(fp)    
@@ -123,7 +123,7 @@ seqc.diff.sleuth <- function(folders, between.groups=1:5, inner.groups=list(c(1,
 #' @return Produces a plot and returns the area under the curve.
 #'
 #' @export
-posplot <- function(p,fp1,fp2=NULL,subsamp=200,pround=2,add=F,xlab="DEGs between replicates",ylab="DEGs between conditions",main="Positives plot",col="black",xlim=NULL,ylim=NULL,lwd=3,lty=1, auc.plotted=F){
+posplot <- function(p,fp1,fp2=NULL,subsamp=200,pround=2,add=FALSE,xlab="DEGs between replicates",ylab="DEGs between conditions",main="Positives plot",col="black",xlim=NULL,ylim=NULL,lwd=3,lty=1, auc.plotted=FALSE){
     if(is.null(fp2)) fp2 <- fp1
     if(is.null(ylim))   ylim <- c(0,length(p))
     if(is.null(xlim))   xlim <- c(0,length(p))
@@ -166,22 +166,22 @@ posplot <- function(p,fp1,fp2=NULL,subsamp=200,pround=2,add=F,xlab="DEGs between
 #' @param do.plot Logical, whether to produce Positives plots (see \code{\link{posplot}}). Default TRUE.
 #' @param returnData Logical, whether to return the resulting data.
 #'
-#' @return Produces a plot, and returns a list if returnData=T.
+#' @return Produces a plot, and returns a list if returnData=TRUE.
 #'
 #' @export
-seqc.diff.example <- function(e=NULL, site="BGI", tests=c("edgeR","voom","DESeq2"), between.groups=1:5, inner.groups=list(c(1,2,3),c(4,5)), do.plot=T, returnData=F){
+seqc.diff.example <- function(e=NULL, site="BGI", tests=c("edgeR","voom","DESeq2"), between.groups=1:5, inner.groups=list(c(1,2,3),c(4,5)), do.plot=TRUE, returnData=FALSE){
     if(is.null(e)){
         e <- seqc.prepareData(site)
     }else{
         if(class(e)=="character"){
-            e <- read.delim(e,header=T,row.names=1)
+            e <- read.delim(e,header=TRUE,row.names=1)
         }
         colnames(e) <- gsub("_","",colnames(e))
     }
     ps <- list()
     for(de in tests){
         message(paste("\n # ",de))
-        ps[[de]] <- seqc.diff(e=e,de=de,do.plot=F, between.groups=between.groups, inner.groups=inner.groups)
+        ps[[de]] <- seqc.diff(e=e,de=de,do.plot=FALSE, between.groups=between.groups, inner.groups=inner.groups)
     }
     
     if(do.plot) seqc.diff.plot(ps)
@@ -199,7 +199,7 @@ seqc.diff.example <- function(e=NULL, site="BGI", tests=c("edgeR","voom","DESeq2
 #' @return A data.frame of counts, with gene symbols as row.names.
 #'
 #' @export
-seqc.prepareData <- function(site="BGI", removeERCC=T){
+seqc.prepareData <- function(site="BGI", removeERCC=TRUE){
     site <- match.arg(site, c("AGR","BGI","CNL","COH","MAY","NVS"))
     if(!.checkPkg("seqc"))	stop("The package 'seqc' should first be installed before using this function.")
     library(seqc)
@@ -207,7 +207,7 @@ seqc.prepareData <- function(site="BGI", removeERCC=T){
     e <- get(paste("ILM_refseq_gene",site,sep="_"))
     if(removeERCC) e <- e[which(!e$IsERCC),]
     # we aggregate the different lanes for each sample
-    sn <- sapply(names(e)[5:ncol(e)],FUN=function(x){ paste(strsplit(x,"_",fixed=T)[[1]][1:2],collapse="")})
+    sn <- sapply(names(e)[5:ncol(e)],FUN=function(x){ paste(strsplit(x,"_",fixed=TRUE)[[1]][1:2],collapse="")})
     e2 <- aggregate(t(e[,5:ncol(e)]),by=list(sample=sn),FUN=sum)
     row.names(e2) <- e2$sample
     e2$sample <- NULL
@@ -236,28 +236,28 @@ seqc.prepareData <- function(site="BGI", removeERCC=T){
 #' @export
 seqc.diff.plot <- function(ps, xlim=c(0,60), ylimAB=c(15000,19000), ylimCD=c(9000,15000)){
     tests <- names(ps)
-    layout(matrix(1:4,nrow=2,byrow=T))
+    layout(matrix(1:4,nrow=2,byrow=TRUE))
     
     message("Producing plots for A vs B comparison")
     auc1 <- list()    
     auc1[[names(ps)[[1]]]] <- posplot(ps[[1]][["AvB"]][["p"]],ps[[1]][["A"]][["p"]],ps[[1]][["B"]][["p"]],col=1,main="A vs B")
     if(length(tests)>1){
         for(i in 2:length(tests)){
-            auc1[[names(ps)[[i]]]] <- posplot(ps[[i]][["AvB"]][["p"]],ps[[i]][["A"]][["p"]],ps[[i]][["B"]][["p"]],lty=i,col=i,add=T)
+            auc1[[names(ps)[[i]]]] <- posplot(ps[[i]][["AvB"]][["p"]],ps[[i]][["A"]][["p"]],ps[[i]][["B"]][["p"]],lty=i,col=i,add=TRUE)
         }
         for(i in 1:length(tests)){
-            points(sum(ps[[i]][["A"]][["p"]]<0.01 | ps[[i]][["B"]][["p"]]<0.01, na.rm=T),sum(ps[[i]][["AvB"]][["p"]]<0.01, na.rm=T),col=i,pch=4,cex=2,lwd=2)
+            points(sum(ps[[i]][["A"]][["p"]]<0.01 | ps[[i]][["B"]][["p"]]<0.01, na.rm=TRUE),sum(ps[[i]][["AvB"]][["p"]]<0.01, na.rm=TRUE),col=i,pch=4,cex=2,lwd=2)
         }
     }
     legend("bottomright",bty="n",col=1:length(tests),lwd=3,lty=1:length(tests),legend=sapply(tests,FUN=function(x){ paste(x," (AUC:",round(auc1[[x]],3),")",sep="")}))
     polygon(c(xlim[[1]]-xlim[[2]],2*xlim[[2]],2*xlim[[2]],xlim[[1]]-xlim[[2]],xlim[[1]]-xlim[[2]]),c(ylimAB[[1]],ylimAB[[1]],ylimAB[[2]],ylimAB[[2]],ylimAB[[1]]),lty="dashed")
-    auc1[[names(ps)[[i]]]] <- posplot(ps[[1]][["AvB"]][["p"]],ps[[1]][["A"]][["p"]],ps[[1]][["B"]][["p"]],col=1,main="A vs B",pround=3,xlim=xlim,ylim=ylimAB,auc.plotted=T)
+    auc1[[names(ps)[[i]]]] <- posplot(ps[[1]][["AvB"]][["p"]],ps[[1]][["A"]][["p"]],ps[[1]][["B"]][["p"]],col=1,main="A vs B",pround=3,xlim=xlim,ylim=ylimAB,auc.plotted=TRUE)
     if(length(tests)>1){
         for(i in 2:length(tests)){
-            auc1[[names(ps)[[i]]]] <- posplot(ps[[i]][["AvB"]][["p"]],ps[[i]][["A"]][["p"]],ps[[i]][["B"]][["p"]],lty=i,col=i,add=T,pround=3,xlim=xlim,ylim=ylimAB,auc.plotted=T)
+            auc1[[names(ps)[[i]]]] <- posplot(ps[[i]][["AvB"]][["p"]],ps[[i]][["A"]][["p"]],ps[[i]][["B"]][["p"]],lty=i,col=i,add=TRUE,pround=3,xlim=xlim,ylim=ylimAB,auc.plotted=TRUE)
         }
         for(i in 1:length(tests)){
-            points(sum(ps[[i]][["A"]][["p"]]<0.01 | ps[[i]][["B"]][["p"]]<0.01, na.rm=T),sum(ps[[i]][["AvB"]][["p"]]<0.01, na.rm=T),col=i,pch=4,cex=2,lwd=2)
+            points(sum(ps[[i]][["A"]][["p"]]<0.01 | ps[[i]][["B"]][["p"]]<0.01, na.rm=TRUE),sum(ps[[i]][["AvB"]][["p"]]<0.01, na.rm=TRUE),col=i,pch=4,cex=2,lwd=2)
         }
     }
     legend("bottomright",bty="n",col=1:length(tests),lwd=3,lty=1:length(tests),legend=sapply(tests,FUN=function(x){ paste(x," (AUC:",round(auc1[[x]],3),")",sep="")}))
@@ -267,32 +267,32 @@ seqc.diff.plot <- function(ps, xlim=c(0,60), ylimAB=c(15000,19000), ylimCD=c(900
     auc2[[names(ps)[[1]]]] <- posplot(ps[[1]][["CvD"]][["p"]],ps[[1]][["C"]][["p"]],ps[[1]][["D"]][["p"]],col=1,main="C vs D")
     if(length(tests)>1){
         for(i in 2:length(tests)){
-            auc2[[names(ps)[[i]]]] <- posplot(ps[[i]][["CvD"]][["p"]],ps[[i]][["C"]][["p"]],ps[[i]][["D"]][["p"]],lty=i,col=i,add=T)
+            auc2[[names(ps)[[i]]]] <- posplot(ps[[i]][["CvD"]][["p"]],ps[[i]][["C"]][["p"]],ps[[i]][["D"]][["p"]],lty=i,col=i,add=TRUE)
         }
         for(i in 1:length(tests)){
-            points(sum(ps[[i]][["C"]][["p"]]<0.01 | ps[[i]][["D"]][["p"]]<0.01, na.rm=T),sum(ps[[i]][["CvD"]][["p"]]<0.01, na.rm=T),col=i,pch=4,cex=2,lwd=2)
+            points(sum(ps[[i]][["C"]][["p"]]<0.01 | ps[[i]][["D"]][["p"]]<0.01, na.rm=TRUE),sum(ps[[i]][["CvD"]][["p"]]<0.01, na.rm=TRUE),col=i,pch=4,cex=2,lwd=2)
         }
     }
     legend("bottomright",bty="n",col=1:length(tests),lwd=3,lty=1:length(tests),legend=sapply(tests,FUN=function(x){ paste(x," (AUC:",round(auc2[[x]],3),")",sep="")}))
     polygon(c(xlim[[1]]-xlim[[2]],2*xlim[[2]],2*xlim[[2]],xlim[[1]]-xlim[[2]],xlim[[1]]-xlim[[2]]),c(ylimCD[[1]],ylimCD[[1]],ylimCD[[2]],ylimCD[[2]],ylimCD[[1]]),lty="dashed")
-    auc2[[names(ps)[[1]]]] <- posplot(ps[[1]][["CvD"]][["p"]],ps[[1]][["C"]][["p"]],ps[[1]][["D"]][["p"]],col=1,main="C vs D",pround=3,xlim=xlim,ylim=ylimCD,auc.plotted=T)
+    auc2[[names(ps)[[1]]]] <- posplot(ps[[1]][["CvD"]][["p"]],ps[[1]][["C"]][["p"]],ps[[1]][["D"]][["p"]],col=1,main="C vs D",pround=3,xlim=xlim,ylim=ylimCD,auc.plotted=TRUE)
     if(length(tests)>1){
         for(i in 2:length(tests)){
-            auc2[[names(ps)[[i]]]] <- posplot(ps[[i]][["CvD"]][["p"]],ps[[i]][["C"]][["p"]],ps[[i]][["D"]][["p"]],lty=i,col=i,add=T,pround=3,xlim=xlim,ylim=ylimCD,auc.plotted=T)
+            auc2[[names(ps)[[i]]]] <- posplot(ps[[i]][["CvD"]][["p"]],ps[[i]][["C"]][["p"]],ps[[i]][["D"]][["p"]],lty=i,col=i,add=TRUE,pround=3,xlim=xlim,ylim=ylimCD,auc.plotted=TRUE)
         }
         for(i in 1:length(tests)){
-            points(sum(ps[[i]][["C"]][["p"]]<0.01 | ps[[i]][["D"]][["p"]]<0.01, na.rm=T),sum(ps[[i]][["CvD"]][["p"]]<0.01, na.rm=T),col=i,pch=4,cex=2,lwd=2)
+            points(sum(ps[[i]][["C"]][["p"]]<0.01 | ps[[i]][["D"]][["p"]]<0.01, na.rm=TRUE),sum(ps[[i]][["CvD"]][["p"]]<0.01, na.rm=TRUE),col=i,pch=4,cex=2,lwd=2)
         }
     }
     legend("bottomright",bty="n",col=1:length(tests),lwd=3,lty=1:length(tests),legend=sapply(tests,FUN=function(x){ paste(x," (AUC:",round(auc2[[x]],3),")",sep="")}))
     v <- rep(0,length(tests))
     s <- data.frame(row.names=tests, AB.FN=v, AB.TP=v, AB.FDR=v, CD.FN=v, CD.TP=v, CD.FDR=v)
     for(de in tests){
-        s[de,1] <- sum(ps[[de]][["A"]]$p<0.01, na.rm=T)+sum(ps[[de]][["B"]]$p<0.01, na.rm=T)
-        s[de,2] <- sum(ps[[de]][["AvB"]]$p<0.01, na.rm=T)
+        s[de,1] <- sum(ps[[de]][["A"]]$p<0.01, na.rm=TRUE)+sum(ps[[de]][["B"]]$p<0.01, na.rm=TRUE)
+        s[de,2] <- sum(ps[[de]][["AvB"]]$p<0.01, na.rm=TRUE)
         s[de,3] <- s[de,1]/s[de,2]
-        s[de,4] <- sum(ps[[de]][["C"]]$p<0.01, na.rm=T)+sum(ps[[de]][["D"]]$p<0.01, na.rm=T)
-        s[de,5] <- sum(ps[[de]][["CvD"]]$p<0.01, na.rm=T)
+        s[de,4] <- sum(ps[[de]][["C"]]$p<0.01, na.rm=TRUE)+sum(ps[[de]][["D"]]$p<0.01, na.rm=TRUE)
+        s[de,5] <- sum(ps[[de]][["CvD"]]$p<0.01, na.rm=TRUE)
         s[de,6] <- s[de,4]/s[de,5]
     }
 }

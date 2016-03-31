@@ -4,8 +4,8 @@
 \alias{mROC}
 \title{mROC}
 \usage{
-mROC(tests, sig, show.AUC = T, thres = 0.01, lwd = 2, rounding = 3,
-  na.rm = T, colors = NULL, ...)
+mROC(tests, sig, show.AUC = TRUE, thres = 0.01, lwd = 2, rounding = 3,
+  na.rm = TRUE, colors = NULL, ...)
 }
 \arguments{
 \item{tests}{A list of tests, each element of which should be a data.frame with a "p" column indicating the p-value under that test.}

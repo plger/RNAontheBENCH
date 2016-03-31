@@ -4,7 +4,7 @@
 \alias{pval2fc}
 \title{Plots p-values according to real foldchange.}
 \usage{
-pval2fc(d, real.log2fc, jitter.arrows = T, title = "")
+pval2fc(d, real.log2fc, jitter.arrows = TRUE, title = "")
 }
 \arguments{
 \item{d}{A data.frame as produced in the \code{\link{differentialExpression}} function.}

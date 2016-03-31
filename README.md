@@ -20,13 +20,13 @@ This help will guide you through its main usage.
 
 To install the package, download it and install it using the following R command:
 ```
-install.packages("path/to/RNAontheBENCH.tar.gz", repos=NULL)
+install.packages("path/to/RNAontheBENCH.zip", repos=NULL)
 ```
 
 Alternatively, if you have `devtools` installed you can install the package directly from the git repository using:
 ```
 library(devtools)
-install_git("https://github.com/plger/RNAontheBENCH")
+install_git("https://github.com/plger/RNAontheBENCH", build_vignettes=TRUE)
 ```
 
 Once the package is installed, you can load it and access the vignette for some examples:
@@ -114,8 +114,8 @@ You can test the benchmarkWrapper function using the example data included in th
 library("RNAontheBENCH")
 data(exampledata)
 dir.create("example")
-write.table(exampleTranscriptLevel,"w12.transcripts.quant",sep="\t",quote=F)
-write.table(exampleGeneLevel,"w12.genes.quant",sep="\t",quote=F)
+write.table(exampleTranscriptLevel,"example/w12.transcripts.quant",sep="\t",quote=F)
+write.table(exampleGeneLevel,"example/w12.genes.quant",sep="\t",quote=F)
 ```
 
 (Of note, to reduce their size the matrices contain only spike-ins, genes/transcripts of the Nanostring panel, as well as features with a certain number of reads assigned to them).
@@ -153,7 +153,7 @@ deNanostring( exampleGeneLevel, method="edgeR", norm="TMM",
    quantification="Tophat-featureCounts")
 ```
 
-![plot of chunk deNanostringEG](vignettes/RNAontheBENCH_files/figure-html/deNanostringEG-1.png)
+![plot of chunk deNanostringEG](vignettes/figure/deNanostringEG-1.png)
 
 This function performs the specified DEA analysis, and benchmarks the results by comparing them to a t-test applied to the log-transformed Nanostring measurements, using by default a p-value of 0.01 to identify a gene as differentially-expressed (this can be specified with the 'threshold' argument of the `deNanostring()` function). The figure plotted provides some measures of accuracy, a comparison of the p-values, a comparison of the foldchanges, as well as a Receiver-Operator Characteristic (ROC) curve (and the area under it).
 
@@ -169,7 +169,7 @@ res <- deSpikein( exampleGeneLevel, method="edgeR", norm="TMM",
    quantification="Tophat-featureCounts")
 ```
 
-![plot of chunk deSpikeinEG](vignettes/RNAontheBENCH_files/figure-html/deSpikeinEG-1.png)
+![plot of chunk deSpikeinEG](vignettes/figure/deSpikeinEG-1.png)
 
 
 The function returns the differential expression calls, and produces a figure with six panels:
@@ -198,7 +198,7 @@ The SEQC dataset includes transcriptomes from two different cell lines ("A" and 
 Given the relevant comparisons, such curves can be produced by the `posplot()` function (see `?posplot` for more information). Alternatively, additional functions take care of generating the relevant comparisons and plotting the results: see especially `?seqc.diff` and `?seqc.diff.plot`. Here, we'll showcase these functions using the `seqc.diff.example()` function, which fetches an existing quantification from the `seqc` package, performs the relevant comparisons using three DEA methods, and plots the results. Alternatively, you could use your own quantification of the SEQC data (see `?seqc.diff` and `?seqc.diff.example`).
 
 ```
-seqc.diff.example
+seqc.diff.example()
 ## # Fetching and preparing SEQC data from the BGI site...
 ## 
 ##  #  edgeR
@@ -231,7 +231,7 @@ seqc.diff.example
 ## Producing plots for C vs D comparison
 ```
 
-![plot of chunk seqcDiffEG](vignettes/RNAontheBENCH_files/figure-html/seqcDiffEG-1.png)
+![plot of chunk seqcDiffEG](vignettes/figure/seqcDiffEG-1.png)
 
 
 The function produces 4 plots, the right-hand ones being simply a zoom-in of the left ones. The top row represents the comparison between cell lines A and B, which the bottom row represents the comparison of C and D, which are two different mixtures of cell lines A and B. The results can be roughly read as a ROC curve, with the important caveat that true positives are simply assumed to be true. "X" indicates, for each curve, the 0.01 P-value (or otherwise specified in the function's call).

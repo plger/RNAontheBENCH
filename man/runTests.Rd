@@ -4,7 +4,8 @@
 \alias{runTests}
 \title{Runs a differential expression analysis.}
 \usage{
-runTests(data, groups, norm = "TMM", de = "edgeR", homogenize.mixes = T)
+runTests(data, groups, norm = "TMM", de = "edgeR",
+  homogenize.mixes = TRUE)
 }
 \arguments{
 \item{data}{The expression matrix or data.frame, with gene symbols or transcript Refseq IDs as row.names.}

@@ -5,7 +5,8 @@
 \title{Runs a spike-in differential expression analysis.}
 \usage{
 deSpikein(dat, method = "edgeR", norm = "TMM", quantification = "",
-  homogenize.mixes = T, saveResults = F, savePlot = F, mix1 = NULL)
+  homogenize.mixes = TRUE, saveResults = FALSE, savePlot = FALSE,
+  mix1 = NULL)
 }
 \arguments{
 \item{dat}{The counts matrix or data.frame, with gene symbols or transcript Refseq IDs as row.names, and sample names as column headers.}

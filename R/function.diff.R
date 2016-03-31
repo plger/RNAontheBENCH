@@ -28,7 +28,7 @@
 #'   quantification="Tophat-featureCounts")
 #'
 #' @export
-deSpikein <- function(dat, method="edgeR", norm="TMM", quantification="", homogenize.mixes=T, saveResults=F, savePlot=F, mix1=NULL){
+deSpikein <- function(dat, method="edgeR", norm="TMM", quantification="", homogenize.mixes=TRUE, saveResults=FALSE, savePlot=FALSE, mix1=NULL){
   method=match.arg(method, c("t","logt","edgeR","voom","DESeq","DESeq2","EBSeq"))
   if(method %in% c("DESeq","DESeq2","EBSeq")){
     if(!.checkPkg(method))	stop(paste("The package ",method," should first be installed to call this with method='",method,"'",sep=""))
@@ -64,7 +64,7 @@ deSpikein <- function(dat, method="edgeR", norm="TMM", quantification="", homoge
   }
   
   # ensure that all spike-ins are there, set to 0 the missing ones
-  sp <- merge(dat,ercc,by="row.names",all.y=T)[,1:(ncol(dat)+1)]
+  sp <- merge(dat,ercc,by="row.names",all.y=TRUE)[,1:(ncol(dat)+1)]
   row.names(sp) <- sp$Row.names
   sp$Row.names <- NULL
   sp <- as.matrix(sp)
@@ -77,11 +77,11 @@ deSpikein <- function(dat, method="edgeR", norm="TMM", quantification="", homoge
 
   d <- as.data.frame(runTests(sp, as.factor(names(sp) %in% mix1), de=method, norm=norm, homogenize.mixes=homogenize.mixes))
 
-  if(saveResults) write.table(d,paste("diff",quantification,method,"tsv",sep="."),row.names=T,col.names=T,sep="\t",quote=F)
+  if(saveResults) write.table(d,paste("diff",quantification,method,"tsv",sep="."),row.names=TRUE,col.names=TRUE,sep="\t",quote=FALSE)
 
   d <- d[genes,]  
   
-  name2 <- gsub("%","pc",gsub("(",".",gsub(")",".",quantification,fixed=T),fixed=T),fixed=T)
+  name2 <- gsub("%","pc",gsub("(",".",gsub(")",".",quantification,fixed=TRUE),fixed=TRUE),fixed=TRUE)
   if(savePlot)	png(paste("diff",name2,norm,method,"png",sep="."),width=600,height=800)
   deSpikein.compare(d,quantification,norm,method)
   if(savePlot)	dev.off()
@@ -113,7 +113,7 @@ deNanostring <- function(rnaseq=NULL, method="edgeR", norm="TMM", quantification
         ra <- .getGeneQt()
     }else{
         if(class(rnaseq)=="character"){
-            ra <- read.delim(rnaseq,header=T,row.names=1)
+            ra <- read.delim(rnaseq,header=TRUE,row.names=1)
         }else{
             ra <- rnaseq
             rm(rnaseq)
@@ -123,7 +123,7 @@ deNanostring <- function(rnaseq=NULL, method="edgeR", norm="TMM", quantification
     names(cn) <- c("AJ80", "AJ81", "AJ82", "AJ83", "AJ84", "AJ87", "AJ89", "AJ92", "AJ93")
     if(!all(names(cn) %in% colnames(ra)))   stop(paste("There are missing samples, or the column headers are not of the right format. Expected columns:",paste(names(cn),collapse=", ")))
     ra <- ra[,names(cn)]
-    res <- runTests(ra, cn, norm=norm, de=method, homogenize.mixes=F)
+    res <- runTests(ra, cn, norm=norm, de=method, homogenize.mixes=FALSE)
     deNanostring.compare(res, method, norm, quantification, threshold=threshold)
 }
 
@@ -158,14 +158,14 @@ deNanostring.compare <- function(results, method, norm, quantification="", thres
     }
     cn <- c(3,1,1,1,3,1,3,1,1)
     na <- na[,c("AJ80", "AJ81", "AJ82", "AJ83", "AJ84", "AJ87", "AJ89", "AJ92", "AJ93")]
-    na$p <- apply(na,1,FUN=function(x){ x <- as.numeric(x); t <- try(t.test(log(x[which(cn==3)]),log(x[which(cn==1)])),silent=T); if(class(t)=="try-error") return(NA); t$p.value})
+    na$p <- apply(na,1,FUN=function(x){ x <- as.numeric(x); t <- try(t.test(log(x[which(cn==3)]),log(x[which(cn==1)])),silent=TRUE); if(class(t)=="try-error") return(NA); t$p.value})
     na$p[which(is.na(na$p))] <- 1
     na$fc <- apply(na,1,FUN=function(x){ x <- as.numeric(x); mean(x[which(cn==3)])/mean(x[which(cn==1)])})
     results <- results[row.names(na),]
     results$p[which(is.na(results$p))] <- 1
     results$log2FC[which(is.na(results$log2FC))] <- 0
     results$log2FC[which(is.infinite(results$log2FC))] <- 3*sign(results$log2FC[which(is.infinite(results$log2FC))])
-    layout(matrix(1:4,nrow=2,byrow=T))
+    layout(matrix(1:4,nrow=2,byrow=TRUE))
     frame()
     legend("topleft",bty="n",legend=c("Differential expression analysis,","comparison with Nanostring","(7dup vs WBS lines)","",
     paste("Quantification:",quantification),
@@ -205,7 +205,7 @@ deNanostring.compare <- function(results, method, norm, quantification="", thres
 #' @return A data.frame with the results of the differential expression analysis, as well as a plot.
 #'
 #' @export
-sleuthWrapper <- function(name, folders=NULL, norm="TMM", savePlot=F){
+sleuthWrapper <- function(name, folders=NULL, norm="TMM", savePlot=FALSE){
   if(!.checkPkg("sleuth"))	stop("The sleuth package must be installed to run this functions")
   library(sleuth)
   if(is.null(folders)){
@@ -225,15 +225,15 @@ sleuthWrapper <- function(name, folders=NULL, norm="TMM", savePlot=F){
     package_sf_as_kal(folders)
   }
   if(!file.exists(paste(folders[[1]],"abundance.h5",sep="/")))	stop("Could not find .h5 files, and could not create them either...")
-  design <- data.frame(path=folders, mix=2, stringsAsFactors=F)
+  design <- data.frame(path=folders, mix=2, stringsAsFactors=FALSE)
   samples <- c("AJ80","AJ81","AJ82","AJ83","AJ84","AJ86","AJ87","AJ89","AJ90","AJ91","AJ92","AJ93")
   if(all(samples %in% folders)){
-    row.names(design) = design$sample <- sapply(design$path,FUN=function(x){ strsplit(x,".",fixed=T)[[1]][[1]]})
+    row.names(design) = design$sample <- sapply(design$path,FUN=function(x){ strsplit(x,".",fixed=TRUE)[[1]][[1]]})
     design$mix[which(design$sample %in% c("AJ86","AJ90","AJ91"))] <- 1
   }else{
     samples <- paste(rep(LETTERS[1:4],each=5),rep(1:5,4),sep="")
-    if(all(gsub("_","",folders,fixed=T) %in% samples)){
-        row.names(design) = design$sample <- gsub("_","",folders,fixed=T)
+    if(all(gsub("_","",folders,fixed=TRUE) %in% samples)){
+        row.names(design) = design$sample <- gsub("_","",folders,fixed=TRUE)
         design <- design[samples[1:10],]
         design$mix[1:5] <- 1
     }else{
@@ -261,14 +261,14 @@ sleuthWrapper <- function(name, folders=NULL, norm="TMM", savePlot=F){
   
   so <- sleuth_fit(so)
   so <- sleuth_wt(so, which_beta = 'as.factor(mix)2')
-  res <- sleuth_results(so,'as.factor(mix)2',show_all=T)
-  m <- merge(res,ercc[,c("ERCC.ID","TX.ID")],by.x="target_id",by.y="TX.ID",all.y=T)
+  res <- sleuth_results(so,'as.factor(mix)2',show_all=TRUE)
+  m <- merge(res,ercc[,c("ERCC.ID","TX.ID")],by.x="target_id",by.y="TX.ID",all.y=TRUE)
 
   row.names(ercc) <- ercc$ERCC.ID
   d <- data.frame(row.names=m$ERCC.ID, log2FC=log2(exp(-1*m$b)), p=m$pval)
   d <- d[as.character(ercc$ERCC.ID),]
 
-  write.table(d,.plfilename("diff",name,norm,"sleuth","tsv"),row.names=T,col.names=T,sep="\t",quote=F)
+  write.table(d,.plfilename("diff",name,norm,"sleuth","tsv"),row.names=TRUE,col.names=TRUE,sep="\t",quote=FALSE)
 
   if(savePlot)	png(.plfilename("diff",name,norm,"sleuth","png"),width=600,height=800)
   deSpikein.compare(d,name,norm,"sleuth")
@@ -276,9 +276,9 @@ sleuthWrapper <- function(name, folders=NULL, norm="TMM", savePlot=F){
 }
 
 # t-test wrapper; returns a p-value if possible
-.try.t <- function(data, groups, logt=F, var.equal=T){
+.try.t <- function(data, groups, logt=FALSE, var.equal=TRUE){
   if(logt)	data = log2(data+0.001)
-  t <- try(t.test(as.numeric(data[which(groups==unique(groups)[[1]])]),as.numeric(data[which(groups==unique(groups)[[2]])]),var.equal=var.equal), silent=T)
+  t <- try(t.test(as.numeric(data[which(groups==unique(groups)[[1]])]),as.numeric(data[which(groups==unique(groups)[[2]])]),var.equal=var.equal), silent=TRUE)
   if(class(t)=="htest")	return(as.numeric(t$p.value))
   return(NA)
 }
@@ -299,7 +299,7 @@ sleuthWrapper <- function(name, folders=NULL, norm="TMM", savePlot=F){
 #' @return A data.frame with the results of the differential expression analysis.
 #'
 #' @export
-runTests <- function(data, groups, norm="TMM", de="edgeR", homogenize.mixes=T){
+runTests <- function(data, groups, norm="TMM", de="edgeR", homogenize.mixes=TRUE){
   de=match.arg(de, c("t","logt","edgeR","voom","DESeq","DESeq2","EBSeq"))
   if(de %in% c("DESeq","DESeq2","EBSeq")){
     if(!.checkPkg(de))	stop(paste("The package ",de," should first be installed to call this with method='",de,"'",sep=""))
@@ -439,8 +439,8 @@ deSpikein.compare <- function(d,quantification,norm="",method=""){
   ROC(d$p,ercc$expected.fold.change.ratio!=1)
   myc(d$p2,ercc$expected.fold.change.ratio!=1,title="C: Sensitivity and specificity by p-value")
   fcdev(d,ercc$log2.Mix.1.Mix.2.,title="E: Foldchange deviations")
-  hf <- hist(d$fdr,breaks=20,plot=F)
-  hp <- hist(d$p,breaks=20,plot=F)
+  hf <- hist(d$fdr,breaks=20,plot=FALSE)
+  hp <- hist(d$p,breaks=20,plot=FALSE)
   hist(d$p,breaks=20,xlim=c(0,1),ylim=c(0,max(c(hf$counts,hp$counts))),xlab="",col="grey",main=paste("B: ",quantification,"-",method,"(",norm,")",sep=""))
   points(1:20/20-0.025,c(hf$counts,rep(0,20-length(hf$counts))),lwd=2,col="blue",type="b",pch=20)
   legend("top",fill=c("grey","blue"),legend=c("p-values","q-values"),bty="n")
@@ -458,7 +458,7 @@ deSpikein.compare <- function(d,quantification,norm="",method=""){
 #' @return Nothing.
 #'
 #' @export
-pval2fc <- function(d,real.log2fc,jitter.arrows=T,title=""){
+pval2fc <- function(d,real.log2fc,jitter.arrows=TRUE,title=""){
   if(jitter.arrows) real.log2fc[which(d$pch==60)] <- jitter(real.log2fc[which(d$pch==60)])
   plot(d$p2, real.log2fc,ylab="log2(expected foldchange)",xlab="log10(p-value)",pch=d$pch,cex=1.5,col="#00000064",main=title)
   abline(v=log10(0.05),lty="dashed",lwd=2,col="red")
@@ -493,8 +493,8 @@ fcdev <- function(d,real.log2fc,title=""){
 myc <- function(logp,sig,title="",xlab="log10(p-value)"){
   if(title=="")	title <- "Sensitivity and specificity by p-value"
   x <- c(0,-0.01,-0.05,-0.1,-0.15,-0.25,-0.5,-0.75,-1,-1.25,-1.5,-1.75,(-4:-10)/2)
-  sensitivity <- sapply(x,FUN=function(z){ sum(sig & logp <= z, na.rm=T)/sum(sig) })
-  specificity <- sapply(x,FUN=function(z){ (sum(!(logp <= z) & !sig , na.rm=T)+sum(is.na(logp) & !sig))/sum(!sig) })
+  sensitivity <- sapply(x,FUN=function(z){ sum(sig & logp <= z, na.rm=TRUE)/sum(sig) })
+  specificity <- sapply(x,FUN=function(z){ (sum(!(logp <= z) & !sig , na.rm=TRUE)+sum(is.na(logp) & !sig))/sum(!sig) })
   plot(x, sensitivity,type="l",lwd=2,ylab="",xlab=xlab,col="blue",ylim=c(0,1),main=title)
   lines(x,specificity,lwd=2,col="red")
   legend("topleft",bty="n",border=c(NA,NA,"black","black",NA,NA,NA),fill=c(NA,NA,"blue","red",NA,NA,NA),
@@ -529,7 +529,7 @@ compareSpikeinDEcalls <- function(tests, thres=0.01, colors=NULL){
     d$sensitivity <- sapply(tests,FUN=function(x){ sum( sig & x$p<thres)/sum(sig) })
     d$specificity <- sapply(tests,FUN=function(x){ sum(!(x$p <= thres | sig))/sum(!sig) })
     d$PPV <- sapply(tests,FUN=function(x){ sum(x$p<thres & sig)/(sum(x$p<thres)) })
-    barplot(as.matrix(d),beside=T,col=colors,main="B: accuracy at p<0.01")
+    barplot(as.matrix(d),beside=TRUE,col=colors,main="B: accuracy at p<0.01")
     legend("topleft",bty="n",fill=colors, legend=names(tests))
 }
 
@@ -548,7 +548,7 @@ compareSpikeinDEcalls <- function(tests, thres=0.01, colors=NULL){
 #' @param ... Any further argument passed to the initial plot function.
 #'
 #' @export
-mROC <- function(tests, sig, show.AUC=T, thres=0.01, lwd=2, rounding=3, na.rm=T, colors=NULL, ...){
+mROC <- function(tests, sig, show.AUC=TRUE, thres=0.01, lwd=2, rounding=3, na.rm=TRUE, colors=NULL, ...){
   shapes <- c(1,22,23,2,6,7,10)
   if(is.null(colors)) colors <- 1:length(tests)
   ll <- list()
@@ -558,7 +558,7 @@ mROC <- function(tests, sig, show.AUC=T, thres=0.01, lwd=2, rounding=3, na.rm=T,
     de <- names(tests)[i]
     p <- as.numeric(tests[[i]]$p)
     p[which(is.na(p))] <- 1    
-    o <- order(p, decreasing=T)
+    o <- order(p, decreasing=TRUE)
     p <- p[o]
     sig2 <- sig[o]
     pp <- unique(2^round(log2(p+1),rounding)-1)
@@ -601,7 +601,7 @@ mROC <- function(tests, sig, show.AUC=T, thres=0.01, lwd=2, rounding=3, na.rm=T,
 #' @export
 ROC <- function(p,sig,main=NULL,rounding=5){
   if(is.null(main))	main <- "A: ROC curve"
-  o <- order(p, decreasing=T)
+  o <- order(p, decreasing=TRUE)
   p <- as.numeric(p[o])
   sig <- sig[o]
   pp <- unique(2^round(log2(p+1),rounding)-1)

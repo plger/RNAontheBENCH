@@ -17,12 +17,12 @@ Constructor for a 'sleuth' object using sailfish data
 }
 \details{
 Converts sailfish results to kallisto HDF5 format, then return the 
-results of \code{\code{\link[sleuth]{sleuth_prep}}} on the
+results of \code{\link[sleuth]{sleuth_prep}} on the
 converted data.
 TAKEN FROM SAILFISH/SALMON DEVELOPERS COMMIT ON THE SLEUTH GIT and provided
 as is; users are advised to double-check for updates on how to use salmon/sailfish
 data with sleuth.
 
-See \code{\code{\link[sleuth]{sleuth_prep}}} for parameters other than sf_dirs.
+See \code{\link[sleuth]{sleuth_prep}} for parameters other than sf_dirs.
 }
 

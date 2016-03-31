@@ -1,22 +1,5 @@
----
-title: "RNAontheBENCH"
-author: "Pierre-Luc Germain"
-date: "`r Sys.Date()`"
-output: 
-  html_document:
-    toc: true
-    depth: 3
-    number_sections: true
-    theme: united
-    highlight: tango
-    graphics: yes
----
-<!--
-  %\VignetteIndexEntry{RNAontheBENCH}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
--->
-
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{RNAontheBENCH}
 
 # Introduction
 
@@ -28,11 +11,9 @@ This package provides empirical and computational resources for benchmarking RNA
 - accuracy metrics based on feature-wise z-scores across samples, in order to assess differential expression accuracy.
 
 This vignette will guide you through its main usage.
-  
-  
-  
-  
-        
+
+<br/><br/><br/>
+      
         
 # Installing the package and fetching the data
 
@@ -46,7 +27,7 @@ install.packages("path/to/RNAontheBENCH.tar.gz", repos=NULL)
 Alternatively, if you have `devtools` installed you can install the package directly from the git repository using:
 ```{r instp2, eval=F}
 library(devtools)
-install_git("https://github.com/plger/RNAontheBENCH")
+install_git("https://github.com/plger/RNAontheBENCH", build_vignettes=TRUE)
 ```
 
 Once the package is installed, you can load it and access the vignette for some examples:
@@ -55,6 +36,7 @@ library(RNAontheBENCH)
 vignette("RNAontheBENCH")
 ```
 
+<br/><br/><br/>
 ## Download the data and analyze it with your method of choice
 
 The benchmark is made using a specific dataset of stranded Truseq mRNA-seq libraries (Ribozero) with 100bp paired-end reads, coming from human induced pluripotent stem cell lines harbouring copy-number alterations of the 7q11.23 region. 
@@ -92,7 +74,9 @@ For the validation dataset (optional), the samples are the following:
 |w306o.shCTR | GSM1539037 |
 |w306o.sh2 | GSM1539038 |
 
-Finally, some functions (see below) can also be applied on the SEQC dataset. For more information on that dataset, see <a href="http://doi.org/10.1038/nbt.2957">Su et al. (2014) "A comprehensive assessment of RNA-seq accuracy, reproducibility and information content by the Sequencing Quality Control Consortium", Nature Biotechnology, 32(9), 903–14</a>.
+Finally, some functions (see below) can also be applied on the SEQC dataset. For more information on that dataset, see <a href="http://doi.org/10.1038/nbt.2957">Su et al. (2014) "A comprehensive assessment of RNA-seq accuracy, reproducibility and information content by the Sequencing Quality Control Consortium", Nature Biotechnology, 32(9), 903???14</a>.
+
+<br/><br/><br/>
 
 ## Make sure your expression matrices are formatted in the right way
 
@@ -102,9 +86,7 @@ Expression values can be read/fragments counts, FPKM, or TPM, and will be automi
 
 If you do not provide a gene-level quantification, transcripts TPMs will automatically be summed to genes.
   
-  
-  
-  
+<br/><br/><br/>
   
 # Benchmarking quantification
 
@@ -133,8 +115,8 @@ You can test the benchmarkWrapper function using the example data included in th
 library("RNAontheBENCH")
 data(exampledata)
 dir.create("example")
-write.table(exampleTranscriptLevel,"w12.transcripts.quant",sep="\t",quote=F)
-write.table(exampleGeneLevel,"w12.genes.quant",sep="\t",quote=F)
+write.table(exampleTranscriptLevel,"example/w12.transcripts.quant",sep="\t",quote=F)
+write.table(exampleGeneLevel,"example/w12.genes.quant",sep="\t",quote=F)
 ```
 ```{r loadlib, echo=FALSE, results="hide", quietly=TRUE}
 library("RNAontheBENCH")
@@ -149,9 +131,7 @@ benchmarkWrapper("example", "tophat.featureCount", qt="counts")
 
 A number of files will be saved in the "example" folder, including an html file allowing to browse these results. These results are the same that can be browsed on the <a href="https://bio.ieo.eu/rnaseqBenchmark/">online platform</a>.
   
-  
-  
-  
+<br/><br/><br/>
   
 # Benchmarking differential expression analysis (DEA)
 
@@ -214,16 +194,48 @@ The SEQC dataset includes transcriptomes from two different cell lines ("A" and 
 
 Given the relevant comparisons, such curves can be produced by the `posplot()` function (see `?posplot` for more information). Alternatively, additional functions take care of generating the relevant comparisons and plotting the results: see especially `?seqc.diff` and `?seqc.diff.plot`. Here, we'll showcase these functions using the `seqc.diff.example()` function, which fetches an existing quantification from the `seqc` package, performs the relevant comparisons using three DEA methods, and plots the results. Alternatively, you could use your own quantification of the SEQC data (see `?seqc.diff` and `?seqc.diff.example`).
 
-```{r seqcDiffEG, cache=TRUE, collapse=TRUE, fig.width=8, fig.height=8}
+```
 seqc.diff.example()
+## # Fetching and preparing SEQC data from the BGI site...
+## 
+##  #  edgeR
+## # Running background differential expression analyses
+## A(1, 2, 3) vs A(4, 5)
+## B(1, 2, 3) vs B(4, 5)
+## C(1, 2, 3) vs C(4, 5)
+## D(1, 2, 3) vs D(4, 5)
+## # Running differential expression analysis A vs B
+## # Running differential expression analysis C vs D
+## 
+##  #  voom
+## # Running background differential expression analyses
+## A(1, 2, 3) vs A(4, 5)
+## B(1, 2, 3) vs B(4, 5)
+## C(1, 2, 3) vs C(4, 5)
+## D(1, 2, 3) vs D(4, 5)
+## # Running differential expression analysis A vs B
+## # Running differential expression analysis C vs D
+## 
+##  #  DESeq2
+## # Running background differential expression analyses
+## A(1, 2, 3) vs A(4, 5)
+## B(1, 2, 3) vs B(4, 5)
+## C(1, 2, 3) vs C(4, 5)
+## D(1, 2, 3) vs D(4, 5)
+## # Running differential expression analysis A vs B
+## # Running differential expression analysis C vs D
+## Producing plots for A vs B comparison
+## Producing plots for C vs D comparison
 ```
 
-The function produces 4 plots, the right-hand ones being simply a zoom-in of the left ones. The top row represents the comparison between cell lines A and B, which the bottom row represents the comparison of C and D, which are two different mixtures of cell lines A and B. The results can be roughly read as a ROC curve, with the important caveat that true positives are simply assumed to be true. "X" indicates, for each curve, the 0.01 P-value (or otherwise specified in the function's call).
+<img src="figure/seqcDiffEG-1.png"/>
+
+The function produces 4 plots (this can take some time), the right-hand ones being simply a zoom-in of the left ones. The top row represents the comparison between cell lines A and B, which the bottom row represents the comparison of C and D, which are two different mixtures of cell lines A and B. The results can be roughly read as a ROC curve, with the important caveat that true positives are simply assumed to be true. "X" indicates, for each curve, the 0.01 P-value (or otherwise specified in the function's call).
 
 Of note, the cell lines are _very_ different from one another, and the high degree of replication makes this a rather simple task for differential expression analysis. For this reason, we would recommend concentrating on the (slightly more subtle) C vs D comparison, and eventually to reduce the number of replicates used. This can all be done using the `between.groups` and `inner.groups` paramters of the `seqc.diff()` and `seqc.diff.example()` functions (see `?seqc.diff`). The default parameter values `between.groups=1:5, inner.groups=list(c(1,2,3),c(4,5))` indicate that replicates 1 to 5 will be used for comparison between groups, while for comparison within group replicates c(1,2,3) will be compared to replicates c(4,5) in each group.
   
   
-  
+<br/><br/><br/>
   
 # Reporting issues
 

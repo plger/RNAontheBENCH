@@ -514,8 +514,9 @@ simStats <- function(x,y,ANALYSIS_NAME, fname,clean=T,norm=F,incZeros=F){
 #' # first we create a directory and put the example quantification file in it:
 #' data(exampledata)
 #' dir.create("example")
-#' write.table(exampleTranscriptLevel,"w12.transcripts.quant",sep="\t",quote=F)
-#' write.table(exampleGeneLevel,"w12.genes.quant",sep="\t",quote=F)
+#' write.table(exampleTranscriptLevel,"w12.transcripts.quant",sep="\t",
+#' quote=FALSE)
+#' write.table(exampleGeneLevel,"w12.genes.quant",sep="\t",quote=FALSE)
 #' # run the wrapper, specifying that folder:
 #' benchmarkWrapper("example", "tophat.featureCount", qt="COUNTS")
 #'

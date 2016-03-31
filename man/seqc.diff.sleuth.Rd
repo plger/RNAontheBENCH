@@ -5,7 +5,7 @@
 \title{seqc.diff.sleuth}
 \usage{
 seqc.diff.sleuth(folders, between.groups = 1:5, inner.groups = list(c(1, 2,
-  3), c(4, 5)), do.plot = T)
+  3), c(4, 5)), do.plot = TRUE)
 }
 \arguments{
 \item{folders}{Folders containing the quantification and bootstraps. The folders should be named "A_1" and so on.}

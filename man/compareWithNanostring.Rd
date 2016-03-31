@@ -26,7 +26,7 @@ Will produce a number of benchmarking plots and files in the current working dir
 # first we create a directory and put the example quantification file in it:
 data(exampledata)
 dir.create("example")
-write.table(exampleGeneLevel,"w12.genes.quant",sep="\\t",quote=F)
+write.table(exampleGeneLevel,"w12.genes.quant",sep="\\t",quote=FALSE)
 # then we run the function, giving a name to the analysis, 
 # specifying the file and type of quantification:
 compareWithNanostring("tophat.featureCount", "w12.genes.quant", qt="COUNTS")
