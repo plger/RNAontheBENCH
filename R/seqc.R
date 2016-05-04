@@ -142,9 +142,14 @@ posplot <- function(p,fp1,fp2=NULL,subsamp=200,pround=2,add=FALSE,xlab="DEGs bet
 		  "FP"=sapply(y,FUN=function(x){ sum(fp1 < x | fp2 < x) }))
     d <- d[which(!duplicated(d)),]
     d[nrow(d)+1,] <- c(length(p),length(p))
-    if(!auc.plotted)    a <- auc(d[,2],d[,1])/length(p)^2
-    w <- which(d[,2] < xlim[[2]]*1.05)
-    if(auc.plotted)    a <- auc(d[w,2],d[w,1])/(xlim[[2]]*1.05*max(d[w,1]))
+    w <- which(d[,2] < xlim[[2]])
+    if(auc.plotted){
+        x <- d[w,2]-min(d[w,2])
+        y <- d[w,1]-min(d[w,1])
+        a <- auc(x,y)/(max(x)*max(y))
+    }else{
+        a <- auc(d[,2],d[,1])/length(p)^2
+    }
     if(max(w) < nrow(d)) w <- c(w,max(w)+1)
     d <- d[w,]
     if(!is.null(subsamp)){
@@ -157,7 +162,6 @@ posplot <- function(p,fp1,fp2=NULL,subsamp=200,pround=2,add=FALSE,xlab="DEGs bet
     }
     return(a)
 }
-
 
 
 #' seqc.diff.example
