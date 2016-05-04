@@ -5,7 +5,8 @@
 \title{seqc.diff.plot}
 \usage{
 seqc.diff.plot(ps, xlim = c(0, 60), ylimAB = c(15000, 19000),
-  ylimCD = c(9000, 15000))
+  ylimCD = c(9000, 15000), use.fdr = FALSE, zoom.AUC = FALSE,
+  pthreshold = 0.01)
 }
 \arguments{
 \item{ps}{A list with softwares as names, and lists as elements, as produced by the 'diff.seqc.example' function. Each sublist contains the results of comparisons between  A vs B, C vs D, and within each group.}
@@ -15,13 +16,19 @@ seqc.diff.plot(ps, xlim = c(0, 60), ylimAB = c(15000, 19000),
 \item{ylimAB}{y coordinates for the AvsB zoomed plot.}
 
 \item{ylimCD}{y coordinates for the CvsD zoomed plot.}
+
+\item{use.fdr}{Logical; whether to use adjust the p-values for multiple testing (FDR); default FALSE.}
+
+\item{zoom.AUC}{whether to report AUC for the zoomed portion of the plot.}
+
+\item{pthreshold}{P-value threshold, to be plotted as a point on the curve and used in the returned statistics.}
 }
 \value{
-Produces 4 plots and returns a list of accuracy values for each test
+Produces 4 plots and returns a list of accuracy values for each test.
 }
 \description{
 Produces a combination of 'positives plot' (see \code{\link{posplot}}) for a list of differential expression calls on the SEQC data.
-The x/ylim parameters control the 'zoomed plots'; the default settings are good for gene-level using all replicates.
+The x/ylim parameters control the 'zoomed plots' (on the right); the default settings are good for gene-level using all replicates.
 For gene-level with only 3 samples/group, use:
  xlim=c(0,60), ylimAB=c(5000,15500), ylimCD=c(2000,12000)
 For transcript-level with all samples, use:

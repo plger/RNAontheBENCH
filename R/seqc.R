@@ -118,12 +118,13 @@ seqc.diff.sleuth <- function(folders, between.groups=1:5, inner.groups=list(c(1,
 #' @param ylim Passed to the plot function.
 #' @param lwd Passed to the plot function, default 3.
 #' @param lty Passed to the plot function, default 1.
+#' @param use.fdr Logical; whether to use adjust the p-values for multiple testing (FDR); default FALSE.
 #' @param auc.plotted Whether to compute the area under the plotted curve (i.e. within plotting limits) instead of that of the full curve (default FALSE).
 #'
 #' @return Produces a plot and returns the area under the curve.
 #'
 #' @export
-posplot <- function(p,fp1,fp2=NULL,subsamp=200,pround=2,add=FALSE,xlab="DEGs between replicates",ylab="DEGs between conditions",main="Positives plot",col="black",xlim=NULL,ylim=NULL,lwd=3,lty=1, auc.plotted=FALSE){
+posplot <- function(p,fp1,fp2=NULL,subsamp=200,pround=2,add=FALSE,xlab="DEGs between replicates",ylab="DEGs between conditions",main="Positives plot",col="black",xlim=NULL,ylim=NULL,lwd=3,lty=1,use.fdr=FALSE,auc.plotted=FALSE){
     if(is.null(fp2)) fp2 <- fp1
     if(is.null(ylim))   ylim <- c(0,length(p))
     if(is.null(xlim))   xlim <- c(0,length(p))
@@ -131,6 +132,11 @@ posplot <- function(p,fp1,fp2=NULL,subsamp=200,pround=2,add=FALSE,xlab="DEGs bet
     p[which(is.na(p))] <- 1
     fp1[which(is.na(fp1))] <- 1
     fp2[which(is.na(fp2))] <- 1
+    if(use.fdr){
+        p <- p.adjust(p,method="fdr")
+        fp1 <- p.adjust(fp1,method="fdr")
+        fp2 <- p.adjust(fp2,method="fdr")
+    }
     y <- c(0,10^unique(round(log10(p[order(p)]),pround)),1)
     d <- data.frame("PTP"=sapply(y,FUN=function(x){ sum(p < x) }),
 		  "FP"=sapply(y,FUN=function(x){ sum(fp1 < x | fp2 < x) }))
@@ -215,27 +221,46 @@ seqc.prepareData <- function(site="BGI", removeERCC=TRUE){
     e[,which(colnames(e) %in% paste(rep(LETTERS[1:4],each=5),rep(1:5,5),sep=""))]
 }
 
+
+.dopadj <- function(x){
+    p <- as.numeric(x[["p"]])
+    p[which(is.na(p))] <- 1
+    x[["p"]] <- p.adjust(p,method="fdr")
+    return(x)
+}
+
 #' seqc.diff.plot
 #'
 #' Produces a combination of 'positives plot' (see \code{\link{posplot}}) for a list of differential expression calls on the SEQC data.
-#' The x/ylim parameters control the 'zoomed plots'; the default settings are good for gene-level using all replicates.
+#' The x/ylim parameters control the 'zoomed plots' (on the right); the default settings are good for gene-level using all replicates.
 #' For gene-level with only 3 samples/group, use:
 #'  xlim=c(0,60), ylimAB=c(5000,15500), ylimCD=c(2000,12000)
 #' For transcript-level with all samples, use:
 #'  xlim=c(0,250), ylimAB=c(10000,24000), ylimCD=c(4000,17000)
 #' For transcript-level with only 3 samples/group, use:
 #'  xlim=c(0,200), ylimAB=c(0,23000), ylimCD=c(0,14000)
+#' If using FDR, try the following zoom windows:
+#'  gene-level (all): xlim=c(0,50),ylimAB=c(12000,20000),ylimCD=c(5000,17000)
+#'  gene-level (subset): xlim=c(0,60),ylimAB=c(8000,20000),ylimCD=c(2000,17000)
+#'  transcript-level (all): xlim=c(0,200), ylimAB=c(10000,35000), ylimCD=c(2000,35000)
+#'  transcript-level (subset): xlim=c(0,250), ylimAB=c(0,35000), ylimCD=c(0,27000)
 #'
 #' @param ps A list with softwares as names, and lists as elements, as produced by the 'diff.seqc.example' function. Each sublist contains the results of comparisons between  A vs B, C vs D, and within each group.
 #' @param xlim x coordinates for the zoomed plot.
 #' @param ylimAB y coordinates for the AvsB zoomed plot.
 #' @param ylimCD y coordinates for the CvsD zoomed plot.
+#' @param use.fdr Logical; whether to use adjust the p-values for multiple testing (FDR); default FALSE.
+#' @param zoom.AUC whether to report AUC for the zoomed portion of the plot.
+#' @param pthreshold P-value threshold, to be plotted as a point on the curve and used in the returned statistics.
+#' @param plotZoomGrid Logical; whether to plot the dashed square indicating, in the overall plot, the zoomed region (default false).
 #'
-#' @return Produces 4 plots and returns a list of accuracy values for each test
+#' @return Produces 4 plots and returns a list of accuracy values for each test.
 #'
 #' @export
-seqc.diff.plot <- function(ps, xlim=c(0,60), ylimAB=c(15000,19000), ylimCD=c(9000,15000)){
+seqc.diff.plot <- function(ps, xlim=c(0,60), ylimAB=c(15000,19000), ylimCD=c(9000,15000), use.fdr=FALSE, zoom.AUC=FALSE, pthreshold=0.01, plotZoomGrid=F){
     tests <- names(ps)
+    if(use.fdr) ps <- lapply(ps,FUN=function(x){ lapply(x,FUN=.dopadj)})
+    
     layout(matrix(1:4,nrow=2,byrow=TRUE))
     
     message("Producing plots for A vs B comparison")
@@ -246,21 +271,25 @@ seqc.diff.plot <- function(ps, xlim=c(0,60), ylimAB=c(15000,19000), ylimCD=c(900
             auc1[[names(ps)[[i]]]] <- posplot(ps[[i]][["AvB"]][["p"]],ps[[i]][["A"]][["p"]],ps[[i]][["B"]][["p"]],lty=i,col=i,add=TRUE)
         }
         for(i in 1:length(tests)){
-            points(sum(ps[[i]][["A"]][["p"]]<0.01 | ps[[i]][["B"]][["p"]]<0.01, na.rm=TRUE),sum(ps[[i]][["AvB"]][["p"]]<0.01, na.rm=TRUE),col=i,pch=4,cex=2,lwd=2)
+            points(sum(ps[[i]][["A"]][["p"]]<pthreshold | ps[[i]][["B"]][["p"]]<pthreshold, na.rm=TRUE),sum(ps[[i]][["AvB"]][["p"]]<pthreshold, na.rm=TRUE),col=i,pch=4,cex=2,lwd=2)
         }
     }
     legend("bottomright",bty="n",col=1:length(tests),lwd=3,lty=1:length(tests),legend=sapply(tests,FUN=function(x){ paste(x," (AUC:",round(auc1[[x]],3),")",sep="")}))
-    polygon(c(xlim[[1]]-xlim[[2]],2*xlim[[2]],2*xlim[[2]],xlim[[1]]-xlim[[2]],xlim[[1]]-xlim[[2]]),c(ylimAB[[1]],ylimAB[[1]],ylimAB[[2]],ylimAB[[2]],ylimAB[[1]]),lty="dashed")
+    if(plotZoomGrid) polygon(c(xlim[[1]]-xlim[[2]],2*xlim[[2]],2*xlim[[2]],xlim[[1]]-xlim[[2]],xlim[[1]]-xlim[[2]]),c(ylimAB[[1]],ylimAB[[1]],ylimAB[[2]],ylimAB[[2]],ylimAB[[1]]),lty="dashed")
     auc1[[names(ps)[[i]]]] <- posplot(ps[[1]][["AvB"]][["p"]],ps[[1]][["A"]][["p"]],ps[[1]][["B"]][["p"]],col=1,main="A vs B",pround=3,xlim=xlim,ylim=ylimAB,auc.plotted=TRUE)
     if(length(tests)>1){
         for(i in 2:length(tests)){
             auc1[[names(ps)[[i]]]] <- posplot(ps[[i]][["AvB"]][["p"]],ps[[i]][["A"]][["p"]],ps[[i]][["B"]][["p"]],lty=i,col=i,add=TRUE,pround=3,xlim=xlim,ylim=ylimAB,auc.plotted=TRUE)
         }
         for(i in 1:length(tests)){
-            points(sum(ps[[i]][["A"]][["p"]]<0.01 | ps[[i]][["B"]][["p"]]<0.01, na.rm=TRUE),sum(ps[[i]][["AvB"]][["p"]]<0.01, na.rm=TRUE),col=i,pch=4,cex=2,lwd=2)
+            points(sum(ps[[i]][["A"]][["p"]]<pthreshold | ps[[i]][["B"]][["p"]]<pthreshold, na.rm=TRUE),sum(ps[[i]][["AvB"]][["p"]]<pthreshold, na.rm=TRUE),col=i,pch=4,cex=2,lwd=2)
         }
     }
-    legend("bottomright",bty="n",col=1:length(tests),lwd=3,lty=1:length(tests),legend=sapply(tests,FUN=function(x){ paste(x," (AUC:",round(auc1[[x]],3),")",sep="")}))
+    if(zoom.AUC){
+        legend("bottomright",bty="n",col=1:length(tests),lwd=3,lty=1:length(tests),legend=sapply(tests,FUN=function(x){ paste(x," (AUC:",round(auc1[[x]],3),")",sep="")}))
+    }else{
+        legend("bottomright",bty="n",col=1:length(tests),lwd=3,lty=1:length(tests),legend=tests)
+    }
 
     message("Producing plots for C vs D comparison")
     auc2 <- list()
@@ -270,7 +299,7 @@ seqc.diff.plot <- function(ps, xlim=c(0,60), ylimAB=c(15000,19000), ylimCD=c(900
             auc2[[names(ps)[[i]]]] <- posplot(ps[[i]][["CvD"]][["p"]],ps[[i]][["C"]][["p"]],ps[[i]][["D"]][["p"]],lty=i,col=i,add=TRUE)
         }
         for(i in 1:length(tests)){
-            points(sum(ps[[i]][["C"]][["p"]]<0.01 | ps[[i]][["D"]][["p"]]<0.01, na.rm=TRUE),sum(ps[[i]][["CvD"]][["p"]]<0.01, na.rm=TRUE),col=i,pch=4,cex=2,lwd=2)
+            points(sum(ps[[i]][["C"]][["p"]]<pthreshold | ps[[i]][["D"]][["p"]]<pthreshold, na.rm=TRUE),sum(ps[[i]][["CvD"]][["p"]]<pthreshold, na.rm=TRUE),col=i,pch=4,cex=2,lwd=2)
         }
     }
     legend("bottomright",bty="n",col=1:length(tests),lwd=3,lty=1:length(tests),legend=sapply(tests,FUN=function(x){ paste(x," (AUC:",round(auc2[[x]],3),")",sep="")}))
@@ -281,18 +310,41 @@ seqc.diff.plot <- function(ps, xlim=c(0,60), ylimAB=c(15000,19000), ylimCD=c(900
             auc2[[names(ps)[[i]]]] <- posplot(ps[[i]][["CvD"]][["p"]],ps[[i]][["C"]][["p"]],ps[[i]][["D"]][["p"]],lty=i,col=i,add=TRUE,pround=3,xlim=xlim,ylim=ylimCD,auc.plotted=TRUE)
         }
         for(i in 1:length(tests)){
-            points(sum(ps[[i]][["C"]][["p"]]<0.01 | ps[[i]][["D"]][["p"]]<0.01, na.rm=TRUE),sum(ps[[i]][["CvD"]][["p"]]<0.01, na.rm=TRUE),col=i,pch=4,cex=2,lwd=2)
+            points(sum(ps[[i]][["C"]][["p"]]<pthreshold | ps[[i]][["D"]][["p"]]<pthreshold, na.rm=TRUE),sum(ps[[i]][["CvD"]][["p"]]<pthreshold, na.rm=TRUE),col=i,pch=4,cex=2,lwd=2)
         }
     }
-    legend("bottomright",bty="n",col=1:length(tests),lwd=3,lty=1:length(tests),legend=sapply(tests,FUN=function(x){ paste(x," (AUC:",round(auc2[[x]],3),")",sep="")}))
+    if(zoom.AUC){
+        legend("bottomright",bty="n",col=1:length(tests),lwd=3,lty=1:length(tests),legend=sapply(tests,FUN=function(x){ paste(x," (AUC:",round(auc2[[x]],3),")",sep="")}))
+    }else{
+        legend("bottomright",bty="n",col=1:length(tests),lwd=3,lty=1:length(tests),legend=tests)
+    }
     v <- rep(0,length(tests))
-    s <- data.frame(row.names=tests, AB.FN=v, AB.TP=v, AB.FDR=v, CD.FN=v, CD.TP=v, CD.FDR=v)
+    seqc.get.stats(ps,use.fdr=F,pthreshold=pthreshold)
+}
+
+#' seqc.get.stats
+#'
+#' Returns test statistics for a list of differential expression calls on the SEQC data.
+#'
+#' @param ps A list with softwares as names, and lists as elements, as produced by the 'diff.seqc.example' function. Each sublist contains the results of comparisons between  A vs B, C vs D, and within each group.
+#' @param use.fdr Logical; whether to use adjust the p-values for multiple testing (FDR); default FALSE.
+#' @param pthreshold P-value (or FDR if use.fdr=TRUE) threshold to use to compute test statistics.
+#'
+#' @return A data frame.
+#'
+#' @export
+seqc.get.stats <- function(ps, use.fdr=FALSE, pthreshold=0.01){
+    tests <- names(ps)
+    if(use.fdr) ps <- lapply(ps,FUN=function(x){ lapply(x,FUN=.dopadj)})
+    v <- rep(0,length(tests))
+    s <- data.frame(row.names=tests, AB.FP=v, AB.TP=v, AB.FDR=v, CD.FP=v, CD.TP=v, CD.FDR=v)
     for(de in tests){
-        s[de,1] <- sum(ps[[de]][["A"]]$p<0.01, na.rm=TRUE)+sum(ps[[de]][["B"]]$p<0.01, na.rm=TRUE)
-        s[de,2] <- sum(ps[[de]][["AvB"]]$p<0.01, na.rm=TRUE)
+        s[de,1] <- sum(ps[[de]][["A"]]$p<pthreshold, na.rm=TRUE)+sum(ps[[de]][["B"]]$p<pthreshold, na.rm=TRUE)
+        s[de,2] <- sum(ps[[de]][["AvB"]]$p<pthreshold, na.rm=TRUE)
         s[de,3] <- s[de,1]/s[de,2]
-        s[de,4] <- sum(ps[[de]][["C"]]$p<0.01, na.rm=TRUE)+sum(ps[[de]][["D"]]$p<0.01, na.rm=TRUE)
-        s[de,5] <- sum(ps[[de]][["CvD"]]$p<0.01, na.rm=TRUE)
+        s[de,4] <- sum(ps[[de]][["C"]]$p<pthreshold, na.rm=TRUE)+sum(ps[[de]][["D"]]$p<pthreshold, na.rm=TRUE)
+        s[de,5] <- sum(ps[[de]][["CvD"]]$p<pthreshold, na.rm=TRUE)
         s[de,6] <- s[de,4]/s[de,5]
     }
+    return(s)    
 }
