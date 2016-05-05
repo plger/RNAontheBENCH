@@ -7,7 +7,8 @@
 posplot(p, fp1, fp2 = NULL, subsamp = 200, pround = 2, add = FALSE,
   xlab = "DEGs between replicates", ylab = "DEGs between conditions",
   main = "Positives plot", col = "black", xlim = NULL, ylim = NULL,
-  lwd = 3, lty = 1, use.fdr = FALSE, auc.plotted = FALSE)
+  lwd = 3, lty = 1, use.fdr = FALSE, auc.plotted = FALSE,
+  ncores = NULL)
 }
 \arguments{
 \item{p}{A vector of p-values across conditions.}
@@ -41,6 +42,8 @@ posplot(p, fp1, fp2 = NULL, subsamp = 200, pround = 2, add = FALSE,
 \item{use.fdr}{Logical; whether to use adjust the p-values for multiple testing (FDR); default FALSE.}
 
 \item{auc.plotted}{Whether to compute the area under the plotted curve (i.e. within plotting limits) instead of that of the full curve (default FALSE).}
+
+\item{ncores}{Number of threads used for computing (default detectedCores()-1)}
 }
 \value{
 Produces a plot and returns the area under the curve.

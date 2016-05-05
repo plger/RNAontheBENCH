@@ -120,11 +120,18 @@ seqc.diff.sleuth <- function(folders, between.groups=1:5, inner.groups=list(c(1,
 #' @param lty Passed to the plot function, default 1.
 #' @param use.fdr Logical; whether to use adjust the p-values for multiple testing (FDR); default FALSE.
 #' @param auc.plotted Whether to compute the area under the plotted curve (i.e. within plotting limits) instead of that of the full curve (default FALSE).
+#' @param ncores Number of threads used for computing (default detectedCores()-1)
 #'
 #' @return Produces a plot and returns the area under the curve.
 #'
 #' @export
-posplot <- function(p,fp1,fp2=NULL,subsamp=200,pround=2,add=FALSE,xlab="DEGs between replicates",ylab="DEGs between conditions",main="Positives plot",col="black",xlim=NULL,ylim=NULL,lwd=3,lty=1,use.fdr=FALSE,auc.plotted=FALSE){
+posplot <- function(p,fp1,fp2=NULL,subsamp=200,pround=2,add=FALSE,xlab="DEGs between replicates",ylab="DEGs between conditions",main="Positives plot",col="black",xlim=NULL,ylim=NULL,lwd=3,lty=1,use.fdr=FALSE,auc.plotted=FALSE,ncores=NULL){
+    if(is.null(ncores)){
+        library(parallel)
+        ncores <- detectCores() - 1
+    }else{
+        if(ncores>1)	library(parallel)
+    }
     if(is.null(fp2)) fp2 <- fp1
     if(is.null(ylim))   ylim <- c(0,length(p))
     if(is.null(xlim))   xlim <- c(0,length(p))
@@ -138,22 +145,25 @@ posplot <- function(p,fp1,fp2=NULL,subsamp=200,pround=2,add=FALSE,xlab="DEGs bet
         fp2 <- p.adjust(fp2,method="fdr")
     }
     y <- c(0,10^unique(round(log10(p[order(p)]),pround)),1)
-    d <- data.frame("PTP"=sapply(y,FUN=function(x){ sum(p < x) }),
+    if(ncores>1){
+        cl <- makeCluster(ncores)
+        clusterExport(cl, c("p","fp1","fp2"), environment())
+        d <- data.frame("PTP"=parSapply(cl,y,FUN=function(x){ sum(p<x) }),
+                        "FP"=parSapply(cl,y,FUN=function(x){ sum(fp1 < x | fp2 < x) }))
+        stopCluster(cl)
+    }else{
+        d <- data.frame("PTP"=sapply(y,FUN=function(x){ sum(p < x) }),
 		  "FP"=sapply(y,FUN=function(x){ sum(fp1 < x | fp2 < x) }))
+    }
     d <- d[which(!duplicated(d)),]
     d[nrow(d)+1,] <- c(length(p),length(p))
-    w <- which(d[,2] < xlim[[2]])
+    w <- which(d[,2] <= xlim[[2]] & d[,2] >= xlim[[1]] & d[,1] <= ylim[[2]] & d[,1] >= ylim[[1]])
     if(auc.plotted){
         x <- d[w,2]-min(d[w,2])
         y <- d[w,1]-min(d[w,1])
         a <- auc(x,y)/(max(x)*max(y))
     }else{
         a <- auc(d[,2],d[,1])/length(p)^2
-    }
-    if(max(w) < nrow(d)) w <- c(w,max(w)+1)
-    d <- d[w,]
-    if(!is.null(subsamp)){
-        if(subsamp>2 & subsamp < nrow(d)) d <- d[c(1,1:(subsamp-2)*floor(nrow(d)/(subsamp-2)),nrow(d)),]
     }
     if(add){
         lines(d[,2],d[,1],lwd=3,lty=lty,col=col)
@@ -244,7 +254,7 @@ seqc.prepareData <- function(site="BGI", removeERCC=TRUE){
 #' For transcript-level with only 3 samples/group, use:
 #'  xlim=c(0,200), ylimAB=c(0,23000), ylimCD=c(0,14000)
 #' If using FDR, try the following zoom windows:
-#'  gene-level (all): xlim=c(0,50),ylimAB=c(12000,20000),ylimCD=c(5000,17000)
+#'  gene-level (all): xlim=c(0,50),ylimAB=c(14000,21000),ylimCD=c(8000,18000)
 #'  gene-level (subset): xlim=c(0,60),ylimAB=c(8000,20000),ylimCD=c(2000,17000)
 #'  transcript-level (all): xlim=c(0,200), ylimAB=c(10000,35000), ylimCD=c(2000,35000)
 #'  transcript-level (subset): xlim=c(0,250), ylimAB=c(0,35000), ylimCD=c(0,27000)
@@ -261,7 +271,7 @@ seqc.prepareData <- function(site="BGI", removeERCC=TRUE){
 #' @return Produces 4 plots and returns a list of accuracy values for each test.
 #'
 #' @export
-seqc.diff.plot <- function(ps, xlim=c(0,60), ylimAB=c(15000,19000), ylimCD=c(9000,15000), use.fdr=FALSE, zoom.AUC=FALSE, pthreshold=0.01, plotZoomGrid=F){
+seqc.diff.plot <- function(ps, xlim=c(0,60), ylimAB=c(8000,17000), ylimCD=c(5000,14000), use.fdr=FALSE, zoom.AUC=FALSE, pthreshold=0.01, plotZoomGrid=F){
     tests <- names(ps)
     if(use.fdr) ps <- lapply(ps,FUN=function(x){ lapply(x,FUN=.dopadj)})
     

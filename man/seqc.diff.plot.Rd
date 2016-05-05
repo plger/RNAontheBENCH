@@ -4,9 +4,9 @@
 \alias{seqc.diff.plot}
 \title{seqc.diff.plot}
 \usage{
-seqc.diff.plot(ps, xlim = c(0, 60), ylimAB = c(15000, 19000),
-  ylimCD = c(9000, 15000), use.fdr = FALSE, zoom.AUC = FALSE,
-  pthreshold = 0.01)
+seqc.diff.plot(ps, xlim = c(0, 60), ylimAB = c(8000, 17000),
+  ylimCD = c(5000, 14000), use.fdr = FALSE, zoom.AUC = FALSE,
+  pthreshold = 0.01, plotZoomGrid = F)
 }
 \arguments{
 \item{ps}{A list with softwares as names, and lists as elements, as produced by the 'diff.seqc.example' function. Each sublist contains the results of comparisons between  A vs B, C vs D, and within each group.}
@@ -22,6 +22,8 @@ seqc.diff.plot(ps, xlim = c(0, 60), ylimAB = c(15000, 19000),
 \item{zoom.AUC}{whether to report AUC for the zoomed portion of the plot.}
 
 \item{pthreshold}{P-value threshold, to be plotted as a point on the curve and used in the returned statistics.}
+
+\item{plotZoomGrid}{Logical; whether to plot the dashed square indicating, in the overall plot, the zoomed region (default false).}
 }
 \value{
 Produces 4 plots and returns a list of accuracy values for each test.
@@ -35,5 +37,10 @@ For transcript-level with all samples, use:
  xlim=c(0,250), ylimAB=c(10000,24000), ylimCD=c(4000,17000)
 For transcript-level with only 3 samples/group, use:
  xlim=c(0,200), ylimAB=c(0,23000), ylimCD=c(0,14000)
+If using FDR, try the following zoom windows:
+ gene-level (all): xlim=c(0,50),ylimAB=c(14000,21000),ylimCD=c(8000,18000)
+ gene-level (subset): xlim=c(0,60),ylimAB=c(8000,20000),ylimCD=c(2000,17000)
+ transcript-level (all): xlim=c(0,200), ylimAB=c(10000,35000), ylimCD=c(2000,35000)
+ transcript-level (subset): xlim=c(0,250), ylimAB=c(0,35000), ylimCD=c(0,27000)
 }
 
