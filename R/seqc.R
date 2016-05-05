@@ -204,7 +204,7 @@ seqc.diff.example <- function(e=NULL, site="BGI", tests=c("edgeR","voom","DESeq2
         ps[[de]] <- seqc.diff(e=e,de=de,do.plot=FALSE, between.groups=between.groups, inner.groups=inner.groups)
     }
     
-    if(do.plot) seqc.diff.plot(ps)
+    if(do.plot) seqc.diff.plot(ps,xlim=c(0,60),ylimAB=c(15000,19000),ylimCD=c(9000,14000))
 
     if(returnData) return(ps)
 }
