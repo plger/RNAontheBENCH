@@ -244,3 +244,19 @@ Of note, the RNA samples are _very_ different from one another, and the high deg
 # Reporting issues
 
 Please report issues on the <a href="https://github.com/plger/RNAontheBENCH">github repository</a>.
+
+  
+<br/><br/><br/>
+    
+# Citation
+
+Please cite:
+```
+citation("RNAontheBENCH")
+## 
+## Germain PL, Vitriolo A, Adamo A, Laise P, Das V and Testa G
+## (2016). "RNAontheBENCH: computational and empirical resources for
+## benchmarking RNAseq quantification and differential expression
+## methods." _Nucleic Acids Research_. <URL:
+## http://doi.org/10.1093/nar/gkw448>.
+```

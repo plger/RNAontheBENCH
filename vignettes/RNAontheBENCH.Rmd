@@ -236,7 +236,17 @@ Of note, the RNA samples are _very_ different from one another, and the high deg
   
   
 <br/><br/><br/>
-  
+    
 # Reporting issues
 
 Please report issues on the <a href="https://github.com/plger/RNAontheBENCH">github repository</a>.
+
+  
+<br/><br/><br/>
+    
+# Citation
+
+Please cite:
+```{r cit}
+citation("RNAontheBENCH")
+```
