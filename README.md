@@ -56,7 +56,7 @@ You will need to download samples GSM1538995 through GSM1539007, and quantify th
 |AJ90 | GSM1539005 |
 |AJ91 | GSM1539006 |
 |AJ92 | GSM1539007 |
-|AJ93 | GSM1539008 |
+|AJ93 | GSM1539000 |
 
 For reasons of comparability, we recommend using the NCBI GRCh38 genome, more specifically the sequence file `GCA_000001405.15_GRCh38_no_alt_analysis_set.fna` supplemented with the sequence of the ERCC spike-ins, and the corresponding gtf file also supplemented with the spike-in annotation. The spike-in sequences and .gtf annotation are available from <a href="http://www.thermofisher.com/order/catalog/product/4456739">the spike-ins' product page</a>.
 
