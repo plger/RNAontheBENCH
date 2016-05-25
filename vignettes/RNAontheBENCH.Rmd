@@ -59,7 +59,7 @@ You will need to download samples GSM1538995 through GSM1539007, and quantify th
 |AJ92 | GSM1539007 |
 |AJ93 | GSM1539000 |
 
-For reasons of comparability, we recommend using the NCBI GRCh38 genome, more specifically the sequence file `GCA_000001405.15_GRCh38_no_alt_analysis_set.fna` supplemented with the sequence of the ERCC spike-ins, and the corresponding gtf file also supplemented with the spike-in annotation. The spike-in sequences and .gtf annotation are available from <a href="http://www.thermofisher.com/order/catalog/product/4456739">the spike-ins' product page</a>.
+For reasons of comparability, we recommend using the NCBI GRCh38 genome, more specifically the sequence file `GCA_000001405.15_GRCh38_no_alt_analysis_set.fna` supplemented with the sequence of the ERCC spike-ins, and the corresponding gtf file also supplemented with the spike-in annotation. The spike-in sequences and .gtf annotation are available from <a href="http://www.thermofisher.com/order/catalog/product/4456739">the spike-ins' product page</a>. Since duplicated transcripts caused some problems for some of the software methods, these were excluded from the analysis. The filtered gtf file used in the paper can be download <a href="https://bio.ieo.eu/rnaseqBenchmark/analyses/genes.gtf.gz">here</a>.
 
 Keep in mind that the libraries are stranded (ISR in the Sailfish/Salmon nomenclature, fr-firststrand in the Tuxedo nomenclature).
 

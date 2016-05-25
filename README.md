@@ -37,7 +37,6 @@ vignette("RNAontheBENCH")
 
 ## Download the data and analyze it with your method of choice
 
-
 The benchmark is made using a specific dataset of stranded Truseq mRNA-seq libraries (Ribozero) with 100bp paired-end reads, coming from human induced pluripotent stem cell lines harbouring copy-number alterations of the 7q11.23 region. 
 The RNA-seq data was published in <a href="http://www.ncbi.nlm.nih.gov/pubmed/25501393">Adamo A, Atashpaz S, Germain PL et al., <i>Nature Genetics</i> 2015, 2:132-41</a>, and is available through the <a href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63058">GEO series GSE63055</a>.
 
@@ -58,7 +57,7 @@ You will need to download samples GSM1538995 through GSM1539007, and quantify th
 |AJ92 | GSM1539007 |
 |AJ93 | GSM1539000 |
 
-For reasons of comparability, we recommend using the NCBI GRCh38 genome, more specifically the sequence file `GCA_000001405.15_GRCh38_no_alt_analysis_set.fna` supplemented with the sequence of the ERCC spike-ins, and the corresponding gtf file also supplemented with the spike-in annotation. The spike-in sequences and .gtf annotation are available from <a href="http://www.thermofisher.com/order/catalog/product/4456739">the spike-ins' product page</a>.
+For reasons of comparability, we recommend using the NCBI GRCh38 genome, more specifically the sequence file `GCA_000001405.15_GRCh38_no_alt_analysis_set.fna` supplemented with the sequence of the ERCC spike-ins, and the corresponding gtf file also supplemented with the spike-in annotation. The spike-in sequences and .gtf annotation are available from <a href="http://www.thermofisher.com/order/catalog/product/4456739">the spike-ins' product page</a>. Since duplicated transcripts caused some problems for some of the software methods, these were excluded from the analysis. The filtered gtf file used in the paper can be download <a href="https://bio.ieo.eu/rnaseqBenchmark/analyses/genes.gtf.gz">here</a>.
 
 Keep in mind that the libraries are stranded (ISR in the Sailfish/Salmon nomenclature, fr-firststrand in the Tuxedo nomenclature).
 
