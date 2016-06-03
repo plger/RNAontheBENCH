@@ -1,7 +1,7 @@
 Package: RNAontheBENCH
 Type: Package
 Title: RNAontheBENCH - Benchmark of RNAseq quantification and DEA
-Version: 1.2
+Version: 1.3
 Date: 2016-03-31
 Author: Pierre-Luc Germain
 Maintainer: <pierre.germain@ieo.eu>

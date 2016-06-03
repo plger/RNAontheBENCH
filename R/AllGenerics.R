@@ -514,9 +514,8 @@ simStats <- function(x,y,ANALYSIS_NAME, fname,clean=T,norm=F,incZeros=F){
 #' # first we create a directory and put the example quantification file in it:
 #' data(exampledata)
 #' dir.create("example")
-#' write.table(exampleTranscriptLevel,"w12.transcripts.quant",sep="\t",
-#' quote=FALSE)
-#' write.table(exampleGeneLevel,"w12.genes.quant",sep="\t",quote=FALSE)
+#' write.table(exampleTranscriptLevel,"example/w12.transcripts.quant",sep="\t",quote=FALSE)
+#' write.table(exampleGeneLevel,"example/w12.genes.quant",sep="\t",quote=FALSE)
 #' # run the wrapper, specifying that folder:
 #' benchmarkWrapper("example", "tophat.featureCount", qt="COUNTS")
 #'
@@ -663,4 +662,56 @@ benchmarkWrapper <- function(rpath, ANALYSIS_NAME, qt){
 
 .plfilename <- function(...){
   gsub("[^[:alnum:]_.]", "", gsub(" ","_",paste(...,collapse=".",sep=".")))
+}
+
+#' readBenchmarkResults
+#'
+#' Reads results metrics of several benchmark folders (i.e. output folders of \code{\link{benchmarkWrapper}}) into a matrix, for comparison.
+#'
+#' @param folders A character vector containing the paths to the benchmark folders
+#' @param dataset Compare metrics for which dataset - either "w12" (default) or "w6"
+#'
+#' @return A dataframe, with metrics as columns and analyses (i.e. folders) as rows. For more information about the metrics, see the Suppl. Table 2 of the paper.
+#' @export
+readBenchmarkResults <- function(folders, dataset="w12"){
+    dataset <- match.arg(dataset, c("w12","w6"))
+    anames <- sapply(folders, FUN=function(folder){
+        if(!file.exists(folder) | !file.info(folder)$isdir)    stop(paste("Could not find folder",folder))
+        x <- readLines(paste(folder,"index.html",sep="/"),5)[5]
+        title <- gsub(pattern="\t<title>RNA-seq benchmark - ([^<]+)</title>", replacement="\\1", x=x)
+        ifelse(title == x, basename(folder), title)
+    })
+    mm <- as.data.frame(t(sapply(folders,dataset=dataset, FUN=function(folder,dataset){
+        d <- list()
+        for(lvl in c('transcript','gene','spikein')){
+            for(qtype in c('expr','fc2mean','zscores')){
+                if(qtype=='fc2mean' & lvl=='spikein') qtype <- 'foldchanges'
+                if(qtype!='zscores' | lvl!='spikein'){
+                    p <- paste(dataset,"*",lvl,qtype,"metrics",sep=".")
+                    fp <- list.files(folder,pattern=p,full.names=T)
+                    if(length(fp)==0)   stop(paste("Could not find file ",folder,"/",p,sep=""))
+                    if(length(fp)>1)    stop(paste("More than one file matches '",p,"' in folder ",folder,sep=""))
+                    a <- read.delim(fp,header=T)
+                    for(i in colnames(a)[-1]) d[[paste(lvl,qtype,i,sep=".")]] <- a[[i]][1]
+                }
+            }
+            fp <- list.files(folder,pattern=paste(dataset,"*",lvl,"stats",sep="."),full.names=T)
+            a <- read.delim(fp,header=T)
+            d[[paste(lvl,"propUndetected",sep=".")]] <- a$prop.undetected
+            if("median.cor.with.copynumber" %in% colnames(a)){
+                d[[paste(lvl,"median.cor.with.copynumber",sep=".")]] <- a$median.cor.with.copynumber
+                d[[paste(lvl,"avg.cor.with.copynumber",sep=".")]] <- a$avg.cor.with.copynumber
+            }
+            if("relAbundance.EIF4H" %in% colnames(a))   d[[paste(lvl,"relAbundance.EIF4H",sep=".")]] <- a$relAbundance.EIF4H
+            if(lvl=='gene' & dataset=="w12"){
+                a <- as.numeric(scan("qPCR.stats","character",nlines=2,skip=1,n=3,quiet=T)[2:3])
+                d[["gene.qPCR.expr.COR"]] <- a[1]
+                d[["gene.qPCR.fc2mean.COR"]] <- a[2]
+            }
+        }
+        return(d)
+    })))
+    colnames(mm) <- gsub("expr","abundance",colnames(mm))
+    rownames(mm) <- anames
+    mm
 }

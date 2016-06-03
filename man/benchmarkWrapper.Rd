@@ -26,9 +26,8 @@ If you instead want to specify files manually, use the individual underlying fun
 # first we create a directory and put the example quantification file in it:
 data(exampledata)
 dir.create("example")
-write.table(exampleTranscriptLevel,"w12.transcripts.quant",sep="\\t",
-quote=FALSE)
-write.table(exampleGeneLevel,"w12.genes.quant",sep="\\t",quote=FALSE)
+write.table(exampleTranscriptLevel,"example/w12.transcripts.quant",sep="\\t",quote=FALSE)
+write.table(exampleGeneLevel,"example/w12.genes.quant",sep="\\t",quote=FALSE)
 # run the wrapper, specifying that folder:
 benchmarkWrapper("example", "tophat.featureCount", qt="COUNTS")
 
