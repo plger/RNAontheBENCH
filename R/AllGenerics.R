@@ -422,8 +422,10 @@ counts2fpkmWrapper <- function(r,level="transcript",uniquelyMappableLengths=NULL
     fsize <- 0
   }else{
     if(tolower(names(r)[1])!="length"){
-      if(level=="tx"){
+      if(level=="transcript"){
 	r <- merge(txInfo,r,by="row.names")
+	r$nbExons <- NULL
+	r$nbTxInGene <- NULL
       }else{
 	r <- merge(geneLengths,r,by="row.names")
       }
