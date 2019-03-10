@@ -1,5 +1,7 @@
 # The RNAontheBENCH package
 
+Archive related to <a href="https://academic.oup.com/nar/article/44/11/5054/2468333">Germain et al., NAR 2016</a>.
+
 This package provides empirical and computational resources for benchmarking RNAseq analysis methods, harnessing a number of features:
 
 - a RNAseq dataset from 12 human iPSC lines all including ExFold ERCC spike-ins (92 transcripts in known concentrations, some of which are differentially-expressed across mixes), as well as an additional validation dataset of 6 samples
@@ -8,9 +10,8 @@ This package provides empirical and computational resources for benchmarking RNA
 - accuracy metrics based on feature-wise z-scores across samples, in order to assess differential expression accuracy.
 
 This help will guide you through its main usage.
-  
-  
-  
+
+**NB:** The original server hosting some of the data and application has been shut down; if you need any of the data, please contact the authors.
   
         
         
@@ -57,7 +58,7 @@ You will need to download samples GSM1538995 through GSM1539007, and quantify th
 |AJ92 | GSM1539007 |
 |AJ93 | GSM1539000 |
 
-For reasons of comparability, we recommend using the NCBI GRCh38 genome, more specifically the sequence file `GCA_000001405.15_GRCh38_no_alt_analysis_set.fna` supplemented with the sequence of the ERCC spike-ins, and the corresponding gtf file also supplemented with the spike-in annotation. The spike-in sequences and .gtf annotation are available from <a href="http://www.thermofisher.com/order/catalog/product/4456739">the spike-ins' product page</a>. Since duplicated transcripts caused some problems for some of the software methods, these were excluded from the analysis. The filtered gtf file used in the paper can be download <a href="https://bio.ieo.eu/rnaseqBenchmark/analyses/genes.gtf.gz">here</a>.
+For reasons of comparability, we recommend using the NCBI GRCh38 genome, more specifically the sequence file `GCA_000001405.15_GRCh38_no_alt_analysis_set.fna` supplemented with the sequence of the ERCC spike-ins, and the corresponding gtf file also supplemented with the spike-in annotation. The spike-in sequences and .gtf annotation are available from <a href="http://www.thermofisher.com/order/catalog/product/4456739">the spike-ins' product page</a>. The main gtf file is in `data/genes.gtf.gz`. Since duplicated transcripts caused some problems for some of the software methods, a filtered version is available in `data/genes_nd.gtf.gz`.
 
 Keep in mind that the libraries are stranded (ISR in the Sailfish/Salmon nomenclature, fr-firststrand in the Tuxedo nomenclature).
 
@@ -76,7 +77,7 @@ Finally, some functions (see below) can also be applied on the SEQC dataset. For
 
 ## Make sure your expression matrices are formatted in the right way
 
-The package expects expression matrices to have refseq ID or gene symbols as row names, and sample names (e.g. `AJ80', as indicated in the tables above) as column headers.
+The package expects expression matrices to have refseq ID or gene symbols as row names, and sample names (e.g. `AJ80`, as indicated in the tables above) as column headers.
 
 Expression values can be read/fragments counts, FPKM, or TPM, and will be automically converted to TPM.
 
